@@ -2,51 +2,54 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>BIOHACKER // NEURAL INTERFACE v9.5</title>
+    <title>BIOHACKER // NEURAL INTERFACE v9.6</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://apis.google.com/js/api.js"></script>
     <style>
-        :root { --red: #ff003c; --blue: #00f3ff; --green: #39ff14; --glass: rgba(15, 15, 20, 0.95); }
+        :root { --red: #ff003c; --blue: #00f3ff; --green: #39ff14; --glass: rgba(15, 15, 20, 0.98); }
         body { 
             background: #000; color: #e0e0e0; font-family: -apple-system, sans-serif; 
-            margin: 0; padding: 10px; height: 100vh; display: flex; flex-direction: column; gap: 10px; overflow: hidden;
+            margin: 0; padding: 10px; display: flex; flex-direction: column; gap: 10px;
         }
         
-        .panel { background: var(--glass); border: 1px solid #333; padding: 12px; border-radius: 12px; flex-shrink: 0; }
-        h2 { color: var(--blue); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 8px 0; border-bottom: 1px solid #333; padding-bottom: 4px; }
+        .panel { background: var(--glass); border: 1px solid #333; padding: 15px; border-radius: 15px; flex-shrink: 0; }
+        h2 { color: var(--red); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 12px 0; border-bottom: 1px solid #333; padding-bottom: 6px; }
         
-        /* Formulario Compacto */
+        /* Formulario Optimizado */
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         label { display: block; font-size: 0.55rem; color: #888; margin-bottom: 2px; text-transform: uppercase; }
-        select, input { width: 100%; background: #111; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 6px; font-size: 0.85rem; box-sizing: border-box; }
-        .btn-add { width: 100%; background: var(--red); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; margin-top: 5px; }
+        select, input { width: 100%; background: #111; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 8px; font-size: 0.9rem; box-sizing: border-box; }
+        .btn-add { width: 100%; background: var(--red); color: #fff; border: none; padding: 15px; border-radius: 10px; font-weight: bold; font-size: 0.9rem; text-transform: uppercase; margin-top: 8px; }
 
-        /* Contenedor Principal (Sin Scroll) */
-        #main-container { flex-grow: 1; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
-
-        /* Card Compacta */
+        /* Tarjetas de Administración */
         .admin-card { 
-            background: #111; border-radius: 12px; padding: 10px; border: 1px solid #222; 
-            display: grid; grid-template-columns: 110px 1fr; gap: 10px; align-items: center; position: relative;
+            background: #111; border-radius: 15px; padding: 12px; border: 1px solid #222; 
+            display: flex; flex-direction: column; gap: 10px; position: relative;
         }
-        .btn-del { position: absolute; top: 5px; right: 5px; color: #444; border: none; background: none; font-size: 0.8rem; }
+        .btn-del { position: absolute; top: 10px; right: 10px; color: #444; border: none; background: none; font-size: 1rem; }
 
-        /* Jeringa Horizontal Dinámica */
-        .syringe-h { 
-            width: 100px; height: 25px; border: 2px solid #fff; position: relative; border-radius: 3px 12px 12px 3px; 
-            background: rgba(255,255,255,0.05); overflow: hidden; display: flex;
+        /* Gráficos Dinámicos */
+        .visual-row { display: flex; align-items: center; gap: 15px; }
+        .syringe-v { 
+            width: 30px; height: 100px; border: 2px solid #fff; position: relative; border-radius: 0 0 5px 5px; 
+            background: rgba(255,255,255,0.05); overflow: hidden; flex-shrink: 0;
         }
-        .fluid-h { height: 100%; transition: width 0.3s; display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-weight: bold; color: #000; }
+        .fluid-v { position: absolute; bottom: 0; width: 100%; transition: height 0.3s; display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-weight: bold; color: #000; }
+        
+        .pill-box { width: 35px; height: 45px; border: 2px solid var(--blue); border-radius: 5px 5px 10px 10px; position: relative; flex-shrink: 0; }
+        .pill-fill { position: absolute; bottom: 4px; left: 4px; right: 4px; top: 15px; background: var(--blue); opacity: 0.7; border-radius: 2px; }
 
-        /* Bote Pastillas */
-        .pill-bottle { width: 40px; height: 50px; border: 2px solid var(--blue); border-radius: 6px 6px 12px 12px; position: relative; background: #111; margin: 0 auto; }
-        .pill-fill { position: absolute; bottom: 5px; left: 5px; right: 5px; top: 15px; background: var(--red); opacity: 0.6; border-radius: 2px; }
+        /* Texto Info */
+        .info-col { flex-grow: 1; }
+        .info-col b { color: var(--green); font-size: 1.1rem; }
+        .info-col p { margin: 2px 0; font-size: 0.65rem; color: #aaa; }
 
-        /* Checklist Mini */
-        .check-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
-        .day-btn { aspect-ratio: 1; background: #1a1a1a; border: 1px solid #333; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold; color: #444; }
-        .day-btn.active { background: var(--red); color: white; border-color: var(--red); }
+        /* Checklist */
+        .check-grid { display: grid; grid-template-columns: repeat(11, 1fr); gap: 4px; margin-top: 5px; }
+        .day-btn { aspect-ratio: 1; background: #1a1a1a; border: 1px solid #333; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold; color: #555; }
+        .day-btn.active { background: var(--red); color: white; border-color: var(--red); box-shadow: 0 0 8px var(--red); }
 
         .hidden { display: none; }
     </style>
@@ -54,17 +57,19 @@
 <body>
 
 <div class="panel">
-    <div style="display:flex; gap:5px; margin-bottom:8px">
-        <button onclick="saveToDrive()" style="flex:1; background:#34A853; color:white; border:none; border-radius:4px; font-size:0.5rem; padding:5px">SYNC DRIVE</button>
+    <div style="display:flex; justify-content:space-between; margin-bottom:10px">
+        <h2 style="margin:0; border:none">NUEVO COMPUESTO</h2>
+        <button onclick="saveToDrive()" style="background:#34A853; color:white; border:none; border-radius:5px; font-size:0.6rem; padding:4px 10px">CLOUD SYNC</button>
     </div>
+    
     <div class="form-grid">
         <div>
             <label>Tipo</label>
             <select id="type" onchange="updateUI()">
-                <option value="aceite">Aceite (Sem)</option>
-                <option value="peptido">Péptido (Dia)</option>
-                <option value="hormona">HGH (Dia)</option>
-                <option value="oral">Oral (Dia)</option>
+                <option value="aceite">Aceite (Semanal)</option>
+                <option value="peptido">Péptido (Diario)</option>
+                <option value="hormona">HGH (Diario)</option>
+                <option value="oral">Oral (Diario)</option>
             </select>
         </div>
         <div>
@@ -72,41 +77,46 @@
             <select id="comp-name"></select>
         </div>
         <div>
-            <label id="label-dose">Dosis (Sem/mg)</label>
+            <label id="label-dose">Dosis (mg/mcg/UI)</label>
             <input type="number" id="input_val" value="500">
         </div>
         <div id="col-freq">
-            <label>Aplic/Sem</label>
+            <label>Aplic/Semana</label>
             <select id="freq">
-                <option value="7">ED</option><option value="3.5">EOD</option><option value="2" selected>2x</option><option value="1">1x</option>
+                <option value="7">ED (7x)</option><option value="3.5">EOD (3.5x)</option>
+                <option value="3">3x/Sem</option><option value="2" selected>2x/Sem</option>
+                <option value="1">1x/Sem</option>
             </select>
         </div>
     </div>
-    <div id="extra-fields" style="display:flex; gap:8px; margin-top:5px">
+    
+    <div id="extra-row" style="display:flex; gap:10px; margin-top:8px">
         <div id="col-conc" style="flex:1">
-            <label>Conc (mg/ml)</label>
+            <label>Concentración (mg/ml)</label>
             <input type="number" id="oil_conc" value="250">
         </div>
         <div id="col-pept" class="hidden" style="flex:1">
-            <label>mg/ml</label>
-            <div style="display:flex; gap:2px"><input type="number" id="v_mg" value="5"><input type="number" id="v_ml" value="2"></div>
+            <label>mg vial / ml agua</label>
+            <div style="display:flex; gap:4px">
+                <input type="number" id="v_mg" value="5"><input type="number" id="v_ml" value="2">
+            </div>
         </div>
     </div>
-    <button class="btn-add" onclick="addItem()">REGISTRAR</button>
+    
+    <button class="btn-add" onclick="addItem()">REGISTRAR EN DASHBOARD</button>
 </div>
 
-<div id="main-container"></div>
+<div id="main-container" style="display:flex; flex-direction:column; gap:10px;"></div>
 
 <script>
-    const CLIENT_ID = '612276120104-tc46nv8856efe38fl7323n9cudkn8pp8.apps.googleusercontent.com';
     let protocol = [];
-    const colors = ["#00f3ff", "#39ff14", "#ff003c", "#f3ff00", "#ff00ff", "#ff8800"];
+    const colors = ["#00f3ff", "#39ff14", "#ff003c", "#f3ff00", "#ff8800", "#ff00ff"];
     
     const db = {
-        aceite: [{n: 'Testo Cipio'}, {n: 'Testo Enant'}, {n: 'DHB Cipio'}, {n: 'Primo'}, {n: 'Masteron'}],
-        peptido: [{n: 'BPC-157'}, {n: 'TB-500'}],
-        hormona: [{n: 'HGH Genotropin'}],
-        oral: [{n: 'Oxandrolona'}, {n: 'Winstrol'}, {n: 'Anavar'}]
+        aceite: [{n: 'Testo Cipio', hl: 8}, {n: 'Testo Enant', hl: 7}, {n: 'DHB Cipio', hl: 8}, {n: 'Primo', hl: 10}, {n: 'Masteron', hl: 6}],
+        peptido: [{n: 'BPC-157', hl: 0.2}, {n: 'TB-500', hl: 120}],
+        hormona: [{n: 'HGH Genotropin', hl: 0.15}],
+        oral: [{n: 'Oxandrolona', hl: 0.4}, {n: 'Winstrol', hl: 1}, {n: 'Anadrol', hl: 0.6}]
     };
 
     function updateUI() {
@@ -115,12 +125,14 @@
         document.getElementById('col-freq').classList.toggle('hidden', t !== 'aceite');
         document.getElementById('col-conc').classList.toggle('hidden', t === 'peptido' || t === 'hormona');
         document.getElementById('col-pept').classList.toggle('hidden', t !== 'peptido');
+        document.getElementById('label-dose').innerText = t === 'aceite' ? 'Dosis Semanal (mg)' : (t === 'peptido' ? 'Dosis Diaria (mcg)' : (t === 'hormona' ? 'Dosis Diaria (UI)' : 'Dosis Diaria (mg)'));
     }
 
     function addItem() {
         const t = document.getElementById('type').value;
         const name = document.getElementById('comp-name').value;
         const val = parseFloat(document.getElementById('input_val').value);
+        const info = db[t].find(c => c.n === name);
         let dose = val; let ml = 0;
 
         if (t === 'aceite') {
@@ -133,7 +145,7 @@
         }
 
         protocol.push({
-            id: Date.now(), type: t, name, dose, ml,
+            id: Date.now(), type: t, name, dose, ml, hl: info.hl,
             unit: t === 'peptido' ? 'mcg' : (t === 'hormona' ? 'UI' : 'mg'),
             checks: new Array(31).fill(false), color: colors[protocol.length % colors.length]
         });
@@ -143,35 +155,43 @@
     function render() {
         const container = document.getElementById('main-container');
         container.innerHTML = "";
+        
+        // Agrupar aceites, el resto individuales
         const aceites = protocol.filter(i => i.type === 'aceite');
         const otros = protocol.filter(i => i.type !== 'aceite');
 
-        if(aceites.length > 0) renderCard(container, "JERINGA ACEITES", aceites, "syringe");
+        if(aceites.length > 0) renderCard(container, "MEZCLA ACEITES", aceites, "syringe");
         otros.forEach(i => renderCard(container, i.name, [i], i.type === 'oral' ? "pill" : "syringe"));
     }
 
     function renderCard(container, title, items, visualType) {
         const totalMl = items.reduce((s, i) => s + i.ml, 0);
+        const ref = items[0];
         const card = document.createElement('div');
         card.className = 'admin-card';
-        const ref = items[0];
 
         card.innerHTML = `
             <button class="btn-del" onclick="removeItem(${ref.id})">✖</button>
-            <div style="text-align:center">
+            <div class="visual-row">
                 ${visualType === 'syringe' ? `
-                    <div class="syringe-h">
-                        ${items.map(i => `<div class="fluid-h" style="width:${(i.ml/Math.max(1,totalMl))*100}%; background:${i.color}">${i.ml.toFixed(2)}</div>`).join('')}
+                    <div class="syringe-v">
+                        ${items.map((i, idx) => {
+                            const h = (i.ml / Math.max(1, totalMl)) * 100;
+                            const bottom = items.slice(0,idx).reduce((s,c)=>(s+(c.ml/Math.max(1, totalMl))*100),0);
+                            return `<div class="fluid-v" style="height:${h}%; bottom:${bottom}%; background:${i.color}">${i.ml.toFixed(2)}</div>`;
+                        }).join('')}
                     </div>
-                    <small style="font-size:0.6rem; color:var(--green)">${totalMl.toFixed(2)}ml</small>
                 ` : `
-                    <div class="pill-bottle"><div class="pill-fill"></div></div>
-                    <small style="font-size:0.6rem; color:var(--red)">${ref.dose}${ref.unit}</small>
+                    <div class="pill-box"><div class="pill-fill"></div></div>
                 `}
+                <div class="info-col">
+                    <p style="color:var(--blue); font-weight:bold">${title}</p>
+                    <b>${totalMl > 0 ? totalMl.toFixed(2) + ' ml' : ref.dose + ' ' + ref.unit}</b>
+                    ${items.map(i => `<p>• ${i.name}: ${i.dose.toFixed(1)}${i.unit} (HL: ${i.hl}d)</p>`).join('')}
+                </div>
             </div>
-            <div>
-                <div style="font-size:0.6rem; color:var(--blue); font-weight:bold">${title}</div>
-                <div class="check-grid">${ref.checks.map((c, idx) => `<div class="day-btn ${c ? 'active' : ''}" onclick="toggleCheck(${ref.id}, ${idx})">${idx+1}</div>`).join('')}</div>
+            <div class="check-grid">
+                ${ref.checks.map((c, idx) => `<div class="day-btn ${c ? 'active' : ''}" onclick="toggleCheck(${ref.id}, ${idx})">${idx+1}</div>`).join('')}
             </div>
         `;
         container.appendChild(card);
