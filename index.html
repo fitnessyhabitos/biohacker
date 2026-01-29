@@ -2,165 +2,134 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>BIOHACKER // NEURAL INTERFACE v8.6</title>
+    <title>BIOHACKER // NEURAL INTERFACE v8.7</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://apis.google.com/js/api.js"></script>
     <style>
-        :root { 
-            --red: #ff003c; --blue: #00f3ff; --green: #39ff14; 
-            --dark-panel: #1a1a1d; --bg: #050505;
-        }
-
-        body { 
-            background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; 
-            margin: 0; padding: 20px; display: grid; grid-template-columns: 360px 1fr; gap: 20px; 
-        }
-
+        :root { --red: #ff003c; --blue: #00f3ff; --green: #39ff14; --dark-panel: #121214; --bg: #050505; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 15px; display: grid; grid-template-columns: 360px 1fr; gap: 20px; }
         @media (max-width: 950px) { body { grid-template-columns: 1fr; } }
 
-        .panel { background: var(--dark-panel); border-radius: 12px; border: 1px solid #333; padding: 20px; }
+        .panel { background: var(--dark-panel); border-radius: 12px; border: 1px solid #333; padding: 20px; position: sticky; top: 15px; }
         h2 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--blue); border-bottom: 1px solid #333; padding-bottom: 8px; margin-bottom: 15px; }
         
-        /* Formulario */
         label { display: block; font-size: 0.6rem; color: #888; margin-bottom: 4px; text-transform: uppercase; }
         select, input { width: 100%; background: #000; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 6px; margin-bottom: 12px; font-size: 0.9rem; }
         .btn-main { width: 100%; background: var(--red); color: #fff; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
 
-        /* Resumen Semanal */
-        .summary-box { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 0.75rem; border-left: 3px solid var(--green); }
-        .summary-item { display: flex; justify-content: space-between; margin-bottom: 5px; border-bottom: 1px solid #222; padding-bottom: 3px; }
-
         /* Admin Cards */
-        .admin-card { 
-            background: #111; border-radius: 12px; padding: 20px; margin-bottom: 20px;
-            display: grid; grid-template-columns: 100px 1fr 220px; gap: 20px; align-items: center;
-            border: 1px solid #333;
-        }
+        .admin-card { background: #111; border-radius: 12px; padding: 20px; margin-bottom: 20px; display: grid; grid-template-columns: 100px 1fr 280px; gap: 20px; align-items: center; border: 1px solid #333; position: relative; }
+        .btn-delete { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #444; cursor: pointer; font-size: 1.2rem; }
+        .btn-delete:hover { color: var(--red); }
 
-        .syringe-body { width: 35px; height: 180px; border: 2px solid #fff; margin: 0 auto; position: relative; border-radius: 0 0 5px 5px; background: rgba(255,255,255,0.05); }
-        .fluid { position: absolute; bottom: 0; width: 100%; display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-weight: bold; color: #000; transition: 0.5s; }
+        /* Jeringuilla Dinámica */
+        .syringe-body { width: 35px; border: 2px solid #fff; margin: 0 auto; position: relative; border-radius: 0 0 5px 5px; background: rgba(255,255,255,0.05); transition: height 0.3s; }
+        .fluid { position: absolute; bottom: 0; width: 100%; display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-weight: bold; color: #000; overflow: hidden; }
 
-        .check-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-        .check-day { width: 25px; height: 25px; border: 1px solid #444; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; cursor: pointer; }
-        .check-day.active { background: var(--red); box-shadow: 0 0 8px var(--red); }
+        /* Checklist Visible */
+        .check-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 10px; }
+        .check-day { aspect-ratio: 1; border: 1px solid #333; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; cursor: pointer; background: #000; color: #666; font-weight: bold; }
+        .check-day.active { background: var(--red); color: white; border-color: var(--red); box-shadow: 0 0 10px var(--red); }
 
-        .ester-tag { font-size: 0.6rem; background: #333; padding: 2px 5px; border-radius: 3px; color: var(--blue); }
+        .summary-item { display: flex; justify-content: space-between; font-size: 0.7rem; margin-bottom: 8px; padding: 8px; background: rgba(0,0,0,0.4); border-radius: 4px; }
         .hidden { display: none; }
-        .alert { color: var(--red); animation: pulse 1s infinite; font-weight: bold; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
 </head>
 <body>
 
 <aside>
     <div class="panel">
-        <h2 style="color: var(--red)">Configuración</h2>
-        <label>Tipo de Compuesto</label>
+        <h2 style="color: var(--red)">BIOSCAN CONFIG</h2>
+        <label>Categoría</label>
         <select id="type" onchange="updateUI()">
             <option value="aceite">Aceite (Mezclable)</option>
-            <option value="peptido">Péptido (mcg)</option>
-            <option value="hormona">HGH (UI)</option>
-            <option value="oral">Oral / Otros</option>
+            <option value="peptido">Péptido (mcg - Dosis Diaria)</option>
+            <option value="hormona">HGH (UI - Dosis Diaria)</option>
+            <option value="oral">Oral (mg - Dosis Diaria)</option>
         </select>
 
-        <label>Sustancia</label>
+        <label>Compuesto</label>
         <select id="comp-name"></select>
 
-        <label id="label-dose">Dosis Semanal Total</label>
-        <input type="number" id="target_week" value="250">
-
-        <label>Frecuencia de Administración</label>
-        <select id="freq">
-            <option value="7">ED (Diario)</option>
-            <option value="3.5">EOD (Día sí / Día no)</option>
-            <option value="3">3 veces por semana</option>
-            <option value="2">2 veces por semana</option>
-            <option value="1">1 vez por semana</option>
-        </select>
+        <label id="label-dose">Dosis (Marca la dosis por TOMA)</label>
+        <input type="number" id="target_dose" value="50">
 
         <div id="box-oil">
+            <label>Frecuencia Semanal</label>
+            <select id="freq">
+                <option value="7">ED (7 veces)</option><option value="3.5">EOD (Día sí/no)</option>
+                <option value="2">2 veces/sem</option><option value="1">1 vez/sem</option>
+            </select>
             <label>Concentración (mg/ml)</label>
             <input type="number" id="conc" value="250">
         </div>
 
         <div id="box-pept" class="hidden">
             <label>Dilución (mg vial / ml agua)</label>
-            <div style="display:flex; gap:10px">
-                <input type="number" id="vial_mg" value="5">
-                <input type="number" id="vial_ml" value="2">
-            </div>
+            <div style="display:flex; gap:10px"><input type="number" id="vial_mg" value="5"><input type="number" id="vial_ml" value="2"></div>
         </div>
 
-        <label>Stock Inicial (Viales/Botes)</label>
-        <input type="number" id="stock_init" value="5">
+        <button class="btn-main" onclick="addItem()">Inject Data</button>
 
-        <button class="btn-main" onclick="addItem()">Añadir al Protocolo</button>
-
-        <div class="summary-box" id="global-summary">
-            <strong>RESUMEN TEÓRICO SEMANAL</strong>
-            <div id="summary-content" style="margin-top:10px"></div>
+        <div id="pk-summary" style="margin-top:20px">
+            <h2>Farmacocinética Estimada</h2>
+            <div id="pk-content"></div>
         </div>
     </div>
 </aside>
 
-<main>
-    <div id="admin-container"></div>
-</main>
+<main id="admin-container"></main>
 
 <script>
     const CLIENT_ID = '612276120104-tc46nv8856efe38fl7323n9cudkn8pp8.apps.googleusercontent.com';
     let protocol = [];
     
-    // Base de datos de compuestos con Vida Media (Half-life)
-    const compoundsDB = {
+    const db = {
         aceite: [
-            {n: 'Testo Cipio', hl: '8 días'}, {n: 'Testo Enantato', hl: '7 días'}, 
-            {n: 'Primobolan', hl: '10 días'}, {n: 'Masteron Prop', hl: '2 días'},
-            {n: 'Masteron Enant', hl: '8 días'}, {n: 'Tren Enantato', hl: '8 días'},
-            {n: 'Boldenona', hl: '14 días'}, {n: 'Deca Durabolin', hl: '15 días'}
+            {n: 'Testo Cipio', hl: 8}, {n: 'Testo Enantato', hl: 7}, {n: 'DHB (Dihydroboldenona)', hl: 8},
+            {n: 'Primobolan', hl: 10}, {n: 'Masteron Prop', hl: 2}, {n: 'Masteron Enant', hl: 8},
+            {n: 'Tren Acetato', hl: 1}, {n: 'Tren Enantato', hl: 8}, {n: 'Boldenona', hl: 14}
         ],
-        peptido: [
-            {n: 'BPC-157', hl: '4-6 horas'}, {n: 'TB-500', hl: '7-15 días'},
-            {n: 'Ipamorelin', hl: '2 horas'}, {n: 'IGF-1 LR3', hl: '20 horas'}
-        ],
-        hormona: [{n: 'HGH Genotropin', hl: '3.5 horas'}, {n: 'HGH Humatrope', hl: '4 horas'}],
-        oral: [{n: 'Oxandrolona', hl: '9 horas'}, {n: 'Winstrol', hl: '24 horas'}, {n: 'Anadrol', hl: '16 horas'}]
+        peptido: [{n: 'BPC-157', hl: 0.2}, {n: 'TB-500', hl: 120}, {n: 'Ipamorelin', hl: 0.1}],
+        hormona: [{n: 'HGH Genotropin', hl: 0.15}],
+        oral: [{n: 'Oxandrolona', hl: 0.4}, {n: 'Winstrol', hl: 1}, {n: 'Anavar', hl: 0.4}]
     };
 
     function updateUI() {
         const t = document.getElementById('type').value;
-        document.getElementById('comp-name').innerHTML = compoundsDB[t].map(c => `<option value="${c.n}">${c.n}</option>`).join('');
-        document.getElementById('box-oil').classList.toggle('hidden', t !== 'aceite' && t !== 'oral');
+        document.getElementById('comp-name').innerHTML = db[t].map(c => `<option value="${c.n}">${c.n}</option>`).join('');
+        document.getElementById('box-oil').classList.toggle('hidden', t !== 'aceite');
         document.getElementById('box-pept').classList.toggle('hidden', t !== 'peptido');
-        document.getElementById('label-dose').innerText = t === 'peptido' ? 'Dosis Semanal (mcg)' : (t === 'hormona' ? 'Dosis Semanal (UI)' : 'Dosis Semanal (mg)');
     }
 
     function addItem() {
         const type = document.getElementById('type').value;
         const name = document.getElementById('comp-name').value;
-        const targetW = parseFloat(document.getElementById('target_week').value);
-        const freq = parseFloat(document.getElementById('freq').value);
-        const info = compoundsDB[type].find(c => c.n === name);
+        const dose = parseFloat(document.getElementById('target_dose').value);
+        const info = db[type].find(c => c.n === name);
         
-        let item = { 
-            id: Date.now(), type, name, targetW, freq, 
-            halfLife: info.hl, 
-            checks: new Array(31).fill(false),
-            color: `hsl(${Math.random()*360}, 70%, 50%)`
-        };
+        let item = { id: Date.now(), type, name, dose, hl: info.hl, checks: new Array(31).fill(false), color: `hsl(${Math.random()*360}, 70%, 50%)` };
 
-        if (type === 'aceite' || type === 'oral') {
+        if (type === 'aceite') {
+            const freq = parseFloat(document.getElementById('freq').value);
             const conc = parseFloat(document.getElementById('conc').value);
-            item.mlPerShot = (targetW / freq) / conc;
+            item.ml = dose / conc;
+            item.weeklyTeo = dose * freq;
             item.unit = "mg";
         } else if (type === 'peptido') {
             const vmg = parseFloat(document.getElementById('vial_mg').value);
             const vml = parseFloat(document.getElementById('vial_ml').value);
-            item.mlPerShot = ((targetW / freq) / 1000) * (vml / vmg);
+            item.ml = (dose / 1000) * (vml / vmg);
+            item.weeklyTeo = dose * 7;
             item.unit = "mcg";
         } else if (type === 'hormona') {
-            item.mlPerShot = (targetW / freq) * 0.1; // 1 UI = 0.1ml
+            item.ml = dose * 0.1;
+            item.weeklyTeo = dose * 7;
             item.unit = "UI";
+        } else {
+            item.ml = 1; // Unidades/Pastillas
+            item.weeklyTeo = dose * 7;
+            item.unit = "mg";
         }
 
         protocol.push(item);
@@ -169,67 +138,48 @@
 
     function render() {
         const container = document.getElementById('admin-container');
-        container.innerHTML = '<h2>Dashboard de Administración</h2>';
+        container.innerHTML = '<h2>NEURAL DASHBOARD // PROTOCOLO ACTIVO</h2>';
         
-        // Agrupación: Aceites juntos, el resto separados
-        const groups = { 'Inyección Aceite': [], 'Péptidos/Hormonas/Orales': [] };
-        
-        protocol.forEach(i => {
-            if (i.type === 'aceite') groups['Inyección Aceite'].push(i);
-            else groups['Péptidos/Hormonas/Orales'].push([i]); // Cada uno en su jeringa
-        });
+        // Agrupar Aceites
+        const aceites = protocol.filter(i => i.type === 'aceite');
+        const otros = protocol.filter(i => i.type !== 'aceite');
 
-        // Renderizar Aceites (Jeringa única)
-        if (groups['Inyección Aceite'].length > 0) {
-            renderCard(container, "MEZCLA DE ACEITES", groups['Inyección Aceite'], true);
-        }
+        if(aceites.length > 0) renderGroup(container, "MEZCLA ACEITES", aceites, true);
+        otros.forEach(i => renderGroup(container, i.name, [i], false));
 
-        // Renderizar el resto (Jeringas individuales)
-        groups['Péptidos/Hormonas/Orales'].forEach(iArr => {
-            renderCard(container, iArr[0].name, iArr, false);
-        });
-
-        updateSummary();
+        updatePK();
     }
 
-    function renderCard(container, title, items, isOilGroup) {
-        const totalMl = items.reduce((s, i) => s + i.mlPerShot, 0);
+    function renderGroup(container, title, items, isOil) {
+        const totalMl = items.reduce((s, i) => s + i.ml, 0);
+        // Modulación de jeringuilla: Si es menos de 0.5ml, escala a 0.5, sino a 2ml
+        const syrMax = totalMl <= 0.5 ? 0.5 : 2.0;
+        const syrHeight = totalMl <= 0.5 ? 120 : 200;
+
         const card = document.createElement('div');
         card.className = 'admin-card';
-        
-        // Usamos el primer item para el calendario (en aceites se asume misma frecuencia)
-        const refItem = items[0]; 
-        const checkedCount = refItem.checks.filter(c => c).length;
+        const refItem = items[0];
 
         card.innerHTML = `
+            <button class="btn-delete" onclick="removeItem(${refItem.id})">✖</button>
             <div class="syringe-box">
-                <div class="syringe-body">
+                <div class="syringe-body" style="height: ${syrHeight}px">
                     ${items.map((i, idx) => {
-                        const h = (i.mlPerShot / 2) * 180; // Escala sobre 2ml
-                        const bottom = items.slice(0,idx).reduce((s,c)=>(s+(c.mlPerShot/2)*180),0);
-                        return `<div class="fluid" style="height:${h}px; bottom:${bottom}px; background:${i.color}">${i.mlPerShot.toFixed(2)}</div>`;
+                        const h = (i.ml / syrMax) * syrHeight;
+                        const bottom = items.slice(0,idx).reduce((s,c)=>(s+(c.ml/syrMax)*syrHeight),0);
+                        return `<div class="fluid" style="height:${h}px; bottom:${bottom}px; background:${i.color}">${i.ml.toFixed(2)}</div>`;
                     }).join('')}
                 </div>
-                <small style="font-size:0.5rem; color:#888">MAX 2.0ml</small>
-            </div>
-            <div class="info-box">
-                <h3 style="margin:0; font-size:0.8rem">${title}</h3>
-                <div style="color:var(--green); font-weight:bold; font-size:1.1rem; margin:5px 0">SHOT: ${totalMl.toFixed(2)} ml</div>
-                ${items.map(i => `
-                    <div style="font-size:0.7rem; margin-bottom:4px">
-                        • ${i.name}: ${(i.targetW/i.freq).toFixed(1)}${i.unit} <span class="ester-tag">VM: ${i.halfLife}</span>
-                    </div>
-                `).join('')}
+                <small style="font-size:0.5rem; color:var(--blue)">MAX ${syrMax}ml</small>
             </div>
             <div>
-                <label>Check Diario (confirmación)</label>
+                <h3 style="margin:0; font-size:0.9rem; color:var(--red)">${title}</h3>
+                <div style="font-size:1.1rem; font-weight:bold; margin:5px 0">SHOT: ${totalMl.toFixed(2)} ${isOil?'ml':'u'}</div>
+                ${items.map(i => `<div style="font-size:0.7rem; color:#888">• ${i.name}: ${i.dose}${i.unit} (Vida M: ${i.hl}d)</div>`).join('')}
+            </div>
+            <div>
                 <div class="check-grid">
-                    ${refItem.checks.map((c, idx) => `
-                        <div class="check-day ${c ? 'active' : ''}" onclick="toggleCheck(${refItem.id}, ${idx})">${idx+1}</div>
-                    `).join('')}
-                </div>
-                <div style="font-size:0.65rem; margin-top:10px; color:#888">
-                    Uso Real este mes: <span style="color:var(--green)">${(checkedCount * (refItem.targetW/refItem.freq)).toFixed(0)} ${refItem.unit}</span>
+                    ${refItem.checks.map((c, idx) => `<div class="check-day ${c ? 'active' : ''}" onclick="toggleCheck(${refItem.id}, ${idx})">${idx+1}</div>`).join('')}
                 </div>
             </div>
         `;
@@ -237,7 +187,6 @@
     }
 
     function toggleCheck(id, day) {
-        // Si es aceite, sincronizamos todos los aceites
         const item = protocol.find(i => i.id === id);
         if (item.type === 'aceite') {
             protocol.filter(i => i.type === 'aceite').forEach(i => i.checks[day] = !i.checks[day]);
@@ -248,17 +197,28 @@
         render();
     }
 
-    function updateSummary() {
-        const content = document.getElementById('summary-content');
-        content.innerHTML = protocol.map(i => `
-            <div class="summary-item">
-                <span>${i.name}</span>
-                <span>${i.targetW} ${i.unit}/sem</span>
-            </div>
-        `).join('');
+    function updatePK() {
+        const content = document.getElementById('pk-content');
+        content.innerHTML = '';
+        protocol.forEach(i => {
+            const checks = i.checks.filter(c => c).length;
+            const realWeekly = (checks / 31) * 7 * i.dose; // Media semanal real
+            // Cálculo simplificado de acumulación (Steady State)
+            const accumulation = i.hl > 1 ? (1 / (1 - Math.pow(0.5, 7/i.hl))) : 1;
+            const state = (realWeekly * accumulation).toFixed(0);
+
+            content.innerHTML += `
+                <div class="summary-item">
+                    <span>${i.name}</span>
+                    <div style="text-align:right">
+                        <div>Teórico: ${i.weeklyTeo.toFixed(0)}${i.unit}/sem</div>
+                        <div style="color:var(--green)">Nivel Sangre Est: ~${state}${i.unit}</div>
+                    </div>
+                </div>`;
+        });
     }
 
-    function remove(id) { protocol = protocol.filter(i => i.id !== id); render(); }
+    function removeItem(id) { protocol = protocol.filter(i => i.id !== id); render(); }
 
     updateUI();
 </script>
