@@ -2,13 +2,14 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>BIOHACKER // NEURAL INTERFACE v8.2</title>
+    <title>BIOHACKER // NEURAL INTERFACE</title>
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="BioHacker">
-    
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" href="apple-touch-icon.png">
+
     <script src="https://apis.google.com/js/api.js"></script>
     
     <style>
@@ -18,110 +19,112 @@
         }
 
         body { 
-            background: #050505; color: #e0e0e0; font-family: 'Segoe UI', Roboto, sans-serif; 
+            background: #050505; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; 
             margin: 0; padding: 20px; display: grid; grid-template-columns: 380px 1fr; gap: 20px; 
             min-height: 100vh;
         }
 
-        /* Estilo Responsive para iPhone */
-        @media (max-width: 850px) {
-            body { grid-template-columns: 1fr; padding: 10px; }
-            .glass-panel { margin-bottom: 10px; }
-        }
+        @media (max-width: 850px) { body { grid-template-columns: 1fr; padding: 10px; } }
 
         .glass-panel { 
             background: var(--glass); backdrop-filter: blur(15px); border: 1px solid #333; 
             padding: 20px; border-radius: 8px; box-shadow: 0 0 25px rgba(0,0,0,0.7); 
         }
 
-        h2 { color: var(--red); font-size: 0.9rem; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 10px; margin-top:0; letter-spacing: 1px;}
+        h2 { color: var(--red); font-size: 0.8rem; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 8px; margin-top:0; letter-spacing: 2px;}
         
-        /* Botones y Formulario */
+        /* Botonera Cloud */
         .cloud-bar { display: flex; gap: 8px; margin-bottom: 20px; }
-        .btn-cloud { flex: 1; border: none; color: white; padding: 10px; border-radius: 4px; font-size: 0.7rem; cursor: pointer; font-weight: bold; }
+        .btn-cloud { flex: 1; border: none; color: white; padding: 10px; border-radius: 4px; font-size: 0.65rem; cursor: pointer; font-weight: bold; text-transform: uppercase; }
+
+        /* Formulario */
         .form-group { margin-bottom: 12px; }
-        label { display: block; font-size: 0.65rem; color: #888; margin-bottom: 4px; text-transform: uppercase; }
-        select, input { width: 100%; background: #000; border: 1px solid #444; color: #fff; padding: 12px; box-sizing: border-box; border-radius: 4px; font-size: 1rem; }
-        .btn-add { width: 100%; background: var(--red); color: #fff; border: none; padding: 16px; font-weight: bold; cursor: pointer; border-radius: 4px; text-transform: uppercase; margin-top: 10px; }
+        label { display: block; font-size: 0.6rem; color: #666; margin-bottom: 4px; text-transform: uppercase; }
+        select, input { width: 100%; background: #000; border: 1px solid #444; color: #fff; padding: 10px; box-sizing: border-box; border-radius: 4px; }
+        .btn-add { width: 100%; background: var(--red); color: #fff; border: none; padding: 14px; font-weight: bold; cursor: pointer; border-radius: 4px; text-transform: uppercase; margin-top: 5px; }
+
+        /* Stock Display */
+        .stock-tag { font-size: 0.65rem; padding: 2px 6px; border-radius: 3px; margin-top: 5px; display: inline-block; }
+        .stock-ok { background: rgba(57, 255, 20, 0.1); color: var(--green); border: 1px solid var(--green); }
+        .stock-low { background: rgba(255, 0, 60, 0.1); color: var(--red); border: 1px solid var(--red); animation: pulse 1.5s infinite; }
 
         /* Jeringuillas */
-        .admin-card { display: flex; align-items: flex-start; gap: 20px; border: 1px solid #333; padding: 15px; border-radius: 8px; background: rgba(255,255,255,0.03); margin-bottom: 15px; border-left: 5px solid var(--red); }
-        .syringe-wrap { width: 90px; text-align: center; }
-        .syringe-body { width: 35px; height: 160px; border: 2px solid #eee; margin: 0 auto; position: relative; background: rgba(255,255,255,0.05); border-radius: 0 0 6px 6px; overflow: hidden; }
-        .fluid { position: absolute; bottom: 0; width: 100%; transition: 0.5s; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: bold; color: #000; text-shadow: 0 0 2px #fff; }
+        .admin-card { display: flex; align-items: flex-start; gap: 20px; border: 1px solid #333; padding: 15px; border-radius: 8px; background: rgba(255,255,255,0.02); margin-bottom: 15px; }
+        .syringe-body { width: 35px; height: 160px; border: 2px solid #eee; margin: 0 auto; position: relative; background: rgba(255,255,255,0.05); border-radius: 0 0 6px 6px; }
+        .fluid { position: absolute; bottom: 0; width: 100%; transition: 0.5s; display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-weight: bold; color: #000; }
 
-        /* Checklist y Stats */
+        /* Calendario */
         .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 15px; }
-        .day { aspect-ratio: 1; border: 1px solid #222; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; }
-        .day.checked { background: var(--red); box-shadow: 0 0 10px var(--red); color: white; border-color: var(--red); }
-        .summary-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #222; font-size: 0.8rem; }
-        .hidden { display: none; }
+        .day { aspect-ratio: 1; border: 1px solid #222; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 3px; }
+        .day.checked { background: var(--red); color: white; border-color: var(--red); box-shadow: 0 0 10px var(--red); }
 
-        /* --- EFECTO BIOSCAN ADN --- */
+        /* Loading Overlay BIOSCAN */
         #loading-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.98); z-index: 9999;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             opacity: 0; visibility: hidden; transition: 0.5s;
         }
         #loading-overlay.active { opacity: 1; visibility: visible; }
-        .dna-container { position: relative; width: 100px; height: 180px; margin-bottom: 20px; }
-        .dna-base { position: absolute; width: 30px; height: 4px; background: var(--red); left: 50%; transform: translateX(-50%); animation: dna-pulse 1.5s infinite; }
-        .scan-line { position: absolute; width: 140%; height: 2px; background: var(--blue); left: -20%; box-shadow: 0 0 15px var(--blue); animation: scan-anim 2s infinite alternate; }
-        @keyframes scan-anim { 0% { top: 0; } 100% { top: 100%; } }
-        @keyframes dna-pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; box-shadow: 0 0 10px var(--red); } }
+        .dna-svg { width: 80px; height: 150px; margin-bottom: 20px; }
+        .scan-bar { width: 120px; height: 2px; background: var(--blue); position: absolute; animation: scan 2s infinite ease-in-out; box-shadow: 0 0 15px var(--blue); }
+
+        @keyframes scan { 0% { top: 30%; } 100% { top: 60%; } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
 <div id="loading-overlay">
-    <div class="dna-container">
-        <div class="scan-line"></div>
-        <div style="top:10%" class="dna-base"></div><div style="top:25%" class="dna-base"></div>
-        <div style="top:40%" class="dna-base"></div><div style="top:55%" class="dna-base"></div>
-        <div style="top:70%" class="dna-base"></div><div style="top:85%" class="dna-base"></div>
-    </div>
-    <p style="color:var(--green); letter-spacing:3px; font-size:0.8rem;">SEQUENCING BIO-DATA...</p>
+    <div class="scan-bar"></div>
+    <svg class="dna-svg" viewBox="0 0 50 100">
+        <path d="M10,10 Q25,50 10,90" stroke="#ff003c" fill="none" stroke-width="2" />
+        <path d="M40,10 Q25,50 40,90" stroke="#00f3ff" fill="none" stroke-width="2" />
+    </svg>
+    <p style="color:var(--green); font-size: 0.7rem; letter-spacing: 4px;">ANALYZING BIODATA...</p>
 </div>
 
 <aside class="glass-panel">
     <div class="cloud-bar">
-        <button onclick="handleAuthClick()" class="btn-cloud" style="background:#4285F4">LOGIN</button>
-        <button onclick="saveToDrive()" class="btn-cloud" style="background:#34A853">SYNC</button>
-        <button onclick="loadFromDrive()" class="btn-cloud" style="background:#DB4437">LOAD</button>
+        <button onclick="handleAuthClick()" class="btn-cloud" style="background:#4285F4">Login</button>
+        <button onclick="saveToDrive()" class="btn-cloud" style="background:#34A853">Sync</button>
+        <button onclick="loadFromDrive()" class="btn-cloud" style="background:#DB4437">Load</button>
     </div>
 
-    <h2>Nuevo Compuesto</h2>
+    <h2>Protocolo Semanal</h2>
     <div class="form-group">
-        <label>Categoría</label>
+        <label>Tipo</label>
         <select id="type" onchange="updateUI()">
-            <option value="anabolico">Anabólico (Aceite)</option>
+            <option value="anabolico">Anabólico</option>
             <option value="peptido">Péptido (mcg)</option>
             <option value="hormona">HGH (UI)</option>
             <option value="oral">Oral</option>
         </select>
     </div>
 
-    <div class="form-group"><label>Sustancia</label><select id="comp-name"></select></div>
+    <div class="form-group">
+        <label>Nombre</label>
+        <select id="comp-name"></select>
+    </div>
 
     <div class="form-group">
-        <label id="label-target">Objetivo Semanal</label>
+        <label>Objetivo Semanal</label>
         <input type="number" id="target_week" value="250">
     </div>
 
     <div id="box-oil" class="form-group">
-        <label>Frecuencia de Inyección</label>
+        <label>Concentración (mg/ml)</label>
+        <input type="number" id="oil_conc" value="250">
+        <label style="margin-top:8px">Frecuencia</label>
         <select id="freq">
             <option value="7">ED (Diario)</option>
             <option value="3.5">EOD (Día sí/no)</option>
             <option value="2">2x Semanal</option>
         </select>
-        <label style="margin-top:8px">Concentración (mg/ml)</label>
-        <input type="number" id="oil_conc" value="250">
     </div>
 
     <div id="box-pept" class="form-group hidden">
-        <label>Dilución Vial (mg totales / ml agua)</label>
+        <label>Dilución (mg vial / ml agua)</label>
         <div style="display:flex; gap:5px">
             <input type="number" id="vial_mg" value="5">
             <input type="number" id="vial_ml" value="2">
@@ -132,10 +135,16 @@
         </select>
     </div>
 
-    <button class="btn-add" onclick="addItem()">Registrar</button>
+    <div class="form-group">
+        <label>Stock Inicial (Viales/Pastillas)</label>
+        <input type="number" id="initial_stock" value="10">
+        <label style="font-size:0.5rem; color:var(--blue)">Indica cuántos viales o pastillas tienes en total</label>
+    </div>
 
-    <h2 style="margin-top:25px">Sumario REAL</h2>
-    <div id="weekly-summary"></div>
+    <button class="btn-add" onclick="addItem()">Registrar Compuesto</button>
+
+    <h2 style="margin-top:25px">Stock de Farmacia</h2>
+    <div id="stock-summary"></div>
 </aside>
 
 <main>
@@ -146,7 +155,7 @@
     <div class="glass-panel" style="margin-top:20px">
         <div style="display:flex; justify-content:space-between">
             <h2>Checklist Mensual</h2>
-            <div id="real-stats" style="color:var(--green); font-weight:bold"></div>
+            <div id="real-stats" style="color:var(--green); font-weight:bold; font-size:0.7rem"></div>
         </div>
         <div class="calendar" id="calendar"></div>
     </div>
@@ -174,7 +183,9 @@
         const type = document.getElementById('type').value;
         const name = document.getElementById('comp-name').value;
         const targetW = parseFloat(document.getElementById('target_week').value);
-        let item = { id: Date.now(), type, name, targetW, color: `hsl(${Math.random()*360}, 80%, 50%)` };
+        const initialStock = parseFloat(document.getElementById('initial_stock').value);
+        
+        let item = { id: Date.now(), type, name, targetW, initialStock, color: `hsl(${Math.random()*360}, 80%, 50%)` };
 
         if(type === 'anabolico' || type === 'oral') {
             const freq = parseFloat(document.getElementById('freq').value);
@@ -182,17 +193,21 @@
             item.ml = (targetW / freq) / conc;
             item.unit = "mg";
             item.sched = type === 'oral' ? "Oral" : "Aceite";
+            item.totalInContainer = type === 'anabolico' ? 10 : 50; // Asumimos vial 10ml o bote 50 pastillas
         } else if(type === 'peptido') {
             const vmg = parseFloat(document.getElementById('vial_mg').value);
             const vml = parseFloat(document.getElementById('vial_ml').value);
             item.ml = ((targetW/7)/1000) * (vml/vmg);
             item.unit = "mcg";
             item.sched = "Péptido " + document.getElementById('schedule').value;
+            item.totalInContainer = vml;
         } else if(type === 'hormona') {
             item.ml = (targetW / 7) * 0.1;
             item.unit = "UI";
             item.sched = "HGH " + document.getElementById('schedule').value;
+            item.totalInContainer = 10; // Vial estándar diluido
         }
+        
         protocol.push(item);
         render();
     }
@@ -210,7 +225,7 @@
 
             grid.innerHTML += `
                 <div class="admin-card">
-                    <div class="syringe-wrap">
+                    <div style="width:70px; text-align:center">
                         <div class="syringe-body">
                             ${items.map((i, idx) => {
                                 const h = (i.ml / syrMax) * 160;
@@ -218,11 +233,15 @@
                                 return `<div class="fluid" style="height:${h}px; bottom:${prevH}px; background:${i.color}">${i.ml.toFixed(2)}</div>`;
                             }).join('')}
                         </div>
-                        <small style="color:var(--blue)">${syrMax}ml</small>
+                        <small style="color:var(--blue); font-size:0.5rem">${syrMax}ml SYR</small>
                     </div>
                     <div style="flex:1">
-                        <h4 style="margin:0; font-size:0.7rem; color:var(--red)">${key.toUpperCase()}</h4>
-                        ${items.map(i => `<div style="font-size:0.8rem; margin:5px 0"><span class="color-dot" style="background:${i.color}"></span>${i.name}: ${i.ml.toFixed(3)}ml <button onclick="remove(${i.id})" style="color:red; background:none; border:none; cursor:pointer">✖</button></div>`).join('')}
+                        <h4 style="margin:0; font-size:0.6rem; color:var(--red)">${key.toUpperCase()}</h4>
+                        ${items.map(i => `<div style="font-size:0.75rem; margin:8px 0">
+                            <span style="width:8px; height:8px; background:${i.color}; display:inline-block; border-radius:50%"></span> 
+                            ${i.name}: ${i.ml.toFixed(3)}ml
+                            <button onclick="remove(${i.id})" style="color:red; background:none; border:none; cursor:pointer; float:right">✖</button>
+                        </div>`).join('')}
                     </div>
                 </div>`;
         }
@@ -231,31 +250,48 @@
 
     function updateCalculations() {
         const checks = document.querySelectorAll('.day.checked').length;
-        document.getElementById('weekly-summary').innerHTML = protocol.map(i => `
-            <div class="summary-item">
-                <span>${i.name}</span>
-                <span>TEO: ${i.targetW} | <span style="color:var(--green)">REAL: ${((i.targetW/7)*checks).toFixed(1)} ${i.unit}</span></span>
-            </div>`).join('');
-        document.getElementById('real-stats').innerText = `DÍAS: ${checks}/31`;
+        const stockSum = document.getElementById('stock-summary');
+        stockSum.innerHTML = '';
+
+        protocol.forEach(i => {
+            const usedTotal = i.ml * checks;
+            const totalStockUnits = i.initialStock * i.totalInContainer;
+            const remaining = totalStockUnits - usedTotal;
+            const percent = (remaining / totalStockUnits) * 100;
+            
+            const statusClass = percent < 20 ? 'stock-low' : 'stock-ok';
+            const statusText = percent < 20 ? '¡PEDIR YA!' : 'EN STOCK';
+
+            stockSum.innerHTML += `
+                <div class="summary-item">
+                    <span>${i.name}</span>
+                    <div style="text-align:right">
+                        <div style="font-size:0.7rem">${remaining.toFixed(1)} / ${totalStockUnits} ml/und</div>
+                        <span class="stock-tag ${statusClass}">${statusText} (${percent.toFixed(0)}%)</span>
+                    </div>
+                </div>`;
+        });
+
+        document.getElementById('real-stats').innerText = `USO REAL: ${checks} DÍAS`;
     }
 
     function renderCalendar() {
         const cal = document.getElementById('calendar'); cal.innerHTML = '';
         for(let i=1; i<=31; i++) {
             const d = document.createElement('div'); d.className = 'day'; d.innerText = i;
-            d.onclick = () => { d.classList.toggle('checked'); updateCalculations(); };
+            d.onclick = () => { d.classList.toggle('checked'); updateCalculations(); if(navigator.vibrate) navigator.vibrate(40); };
             cal.appendChild(d);
         }
     }
 
-    // Google Drive Sync
+    // Google Drive
     function showLoading() { document.getElementById('loading-overlay').classList.add('active'); }
-    function hideLoading() { setTimeout(() => document.getElementById('loading-overlay').classList.remove('active'), 2500); }
+    function hideLoading() { setTimeout(() => document.getElementById('loading-overlay').classList.remove('active'), 2000); }
 
     async function saveToDrive() {
         showLoading();
         const content = JSON.stringify({ protocol, checks: Array.from(document.querySelectorAll('.day')).map(d => d.classList.contains('checked')) });
-        const metadata = { 'name': 'biohacker_v8.json', 'mimeType': 'application/json' };
+        const metadata = { 'name': 'biohacker_v84.json', 'mimeType': 'application/json' };
         const boundary = 'foo';
         const request = gapi.client.request({
             path: driveFileId ? `/upload/drive/v3/files/${driveFileId}` : '/upload/drive/v3/files',
@@ -264,31 +300,31 @@
             headers: { 'Content-Type': 'multipart/related; boundary=' + boundary },
             body: `--${boundary}\nContent-Type: application/json; charset=UTF-8\n\n${JSON.stringify(metadata)}\n--${boundary}\nContent-Type: application/json\n\n${content}\n--${boundary}--`
         });
-        request.execute(f => { driveFileId = f.id; hideLoading(); alert("Cloud Synced"); });
+        request.execute(f => { driveFileId = f.id; hideLoading(); });
     }
 
     async function loadFromDrive() {
         showLoading();
-        const res = await gapi.client.drive.files.list({ q: "name = 'biohacker_v8.json'" });
+        const res = await gapi.client.drive.files.list({ q: "name = 'biohacker_v84.json'" });
         if (res.result.files.length > 0) {
             driveFileId = res.result.files[0].id;
             const file = await gapi.client.drive.files.get({ fileId: driveFileId, alt: 'media' });
             protocol = file.result.protocol || [];
             render();
             const days = document.querySelectorAll('.day');
-            if(file.result.checks) file.result.checks.forEach((c, idx) => { if(c) days[idx].classList.add('checked'); });
+            if(file.result.checks) file.result.checks.forEach((c, idx) => { if(c && days[idx]) days[idx].classList.add('checked'); });
             updateCalculations();
         }
         hideLoading();
     }
 
-    function handleAuthClick() { gapi.auth2.getAuthInstance().signIn().then(() => alert("Conectado")); }
+    function handleAuthClick() { gapi.auth2.getAuthInstance().signIn(); }
+    function remove(id) { protocol = protocol.filter(i => i.id !== id); render(); }
 
     gapi.load('client:auth2', () => {
         gapi.client.init({ clientId: CLIENT_ID, discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"], scope: 'https://www.googleapis.com/auth/drive.file' });
     });
 
-    function remove(id) { protocol = protocol.filter(i => i.id !== id); render(); }
     updateUI();
     renderCalendar();
 </script>
