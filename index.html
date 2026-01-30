@@ -2,37 +2,27 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>BIOHACKER // NEURAL INTERFACE v9.8</title>
+    <title>BIOHACKER // NEURAL INTERFACE v9.9</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://apis.google.com/js/api.js" onload="handleClientLoad()"></script>
     <style>
         :root { --red: #ff003c; --blue: #00f3ff; --green: #39ff14; --glass: rgba(15, 15, 20, 0.98); }
         body { background: #000; color: #e0e0e0; font-family: -apple-system, sans-serif; margin: 0; padding: 10px; display: flex; flex-direction: column; gap: 8px; height: 100vh; overflow: hidden; }
-        
         .panel { background: var(--glass); border: 1px solid #333; padding: 12px; border-radius: 12px; flex-shrink: 0; }
         h2 { color: var(--red); font-size: 0.65rem; text-transform: uppercase; margin: 0 0 8px 0; border-bottom: 1px solid #333; padding-bottom: 4px; }
-        
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
         select, input { width: 100%; background: #111; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 8px; font-size: 0.85rem; }
         .btn-add { width: 100%; background: var(--red); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; margin-top: 8px; text-transform: uppercase; font-size: 0.8rem; }
-
-        /* Status Bar */
         #status-bar { font-size: 0.55rem; color: #555; text-align: center; margin-bottom: 5px; text-transform: uppercase; }
-
-        /* Cards Contenedor */
         #main-container { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-bottom: 20px; }
         .admin-card { background: #111; border-radius: 12px; padding: 10px; border: 1px solid #222; position: relative; display: flex; flex-direction: column; gap: 8px; }
         .btn-del { position: absolute; top: 8px; right: 8px; color: #444; border: none; background: none; font-size: 0.9rem; }
-
-        /* Visuals */
         .visual-row { display: flex; align-items: center; gap: 12px; }
         .syringe-v { width: 28px; height: 85px; border: 1px solid #fff; position: relative; border-radius: 0 0 4px 4px; background: rgba(255,255,255,0.05); overflow: hidden; }
         .fluid-v { position: absolute; bottom: 0; width: 100%; transition: height 0.3s; }
         .pill-v { width: 28px; height: 35px; border: 1px solid var(--blue); border-radius: 4px 4px 8px 8px; position: relative; }
         .pill-fill { position: absolute; bottom: 3px; left: 3px; right: 3px; top: 12px; background: var(--blue); opacity: 0.7; }
-
-        /* Checklist */
         .check-grid { display: grid; grid-template-columns: repeat(11, 1fr); gap: 3px; }
         .day-btn { aspect-ratio: 1; background: #1a1a1a; border: 1px solid #333; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: #444; font-weight: bold; }
         .day-btn.active { background: var(--red); color: white; border-color: var(--red); box-shadow: 0 0 5px var(--red); }
@@ -41,36 +31,34 @@
 </head>
 <body>
 
-<div id="status-bar">Inicializando Interfaz Neural...</div>
+<div id="status-bar">CARGANDO NÚCLEO...</div>
 
 <div class="panel">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
-        <h2 style="margin:0; border:none">NUEVO COMPUESTO</h2>
-        <div id="auth-btn-container">
-            <button onclick="handleAuthClick()" id="login-btn" style="background:#4285F4; color:white; border:none; border-radius:4px; font-size:0.5rem; padding:4px 8px">LOGIN GOOGLE</button>
-        </div>
+        <h2 style="margin:0; border:none">ADMINISTRACIÓN</h2>
+        <button onclick="handleAuthClick()" id="sync-btn" style="background:#4285F4; color:white; border:none; border-radius:4px; font-size:0.5rem; padding:6px 10px; font-weight:bold">CLOUD SYNC (OFFLINE)</button>
     </div>
     
     <div class="form-grid">
         <select id="type" onchange="updateUI()">
-            <option value="aceite">Aceite (Semanal)</option>
-            <option value="peptido">Péptido (Diario)</option>
-            <option value="hormona">HGH (Diario)</option>
-            <option value="oral">Oral (Diario)</option>
+            <option value="aceite">Aceite (Sem)</option>
+            <option value="peptido">Péptido (Día)</option>
+            <option value="hormona">HGH (Día)</option>
+            <option value="oral">Oral (Día)</option>
         </select>
         <select id="comp-name"></select>
-        <input type="number" id="input_val" placeholder="Dosis">
+        <input type="number" id="input_val" placeholder="Cantidad">
         <select id="freq">
-            <option value="7">ED (7x/sem)</option><option value="3.5">EOD</option><option value="2" selected>2x/sem</option>
+            <option value="7">Diario (7x)</option><option value="3.5">Día Sí/No</option><option value="2" selected>2x/Semana</option>
         </select>
     </div>
     <div id="extra-row" style="display:flex; gap:6px; margin-top:6px">
-        <input type="number" id="oil_conc" value="250" placeholder="mg/ml" style="flex:1">
+        <input type="number" id="oil_conc" value="250" style="flex:1">
         <div id="col-pept" class="hidden" style="flex:1; display:flex; gap:4px">
             <input type="number" id="v_mg" value="5" style="width:50%"><input type="number" id="v_ml" value="2" style="width:50%">
         </div>
     </div>
-    <button class="btn-add" onclick="addItem()">REGISTRAR EN DASHBOARD</button>
+    <button class="btn-add" onclick="addItem()">PROGRAMAR DOSIS</button>
 </div>
 
 <div id="main-container"></div>
@@ -82,7 +70,7 @@
     
     let protocol = [];
     let driveFileId = null;
-    const colors = ["#00f3ff", "#39ff14", "#ff003c", "#f3ff00", "#ff8800", "#ff00ff"];
+    const colors = ["#00f3ff", "#39ff14", "#ff003c", "#f3ff00", "#ff8800"];
 
     const db = {
         aceite: [{n: 'Testo Cipio'}, {n: 'Testo Enant'}, {n: 'DHB Cipio'}, {n: 'Primo'}, {n: 'Masteron'}],
@@ -91,54 +79,82 @@
         oral: [{n: 'Oxandrolona'}, {n: 'Winstrol'}]
     };
 
-    // --- GOOGLE DRIVE LOGIC ---
-    function handleClientLoad() { gapi.load('client:auth2', initClient); }
-
-    function initClient() {
-        gapi.client.init({ clientId: CLIENT_ID, discoveryDocs: DISCOVERY_DOCS, scope: SCOPES }).then(() => {
-            const authInstance = gapi.auth2.getAuthInstance();
-            authInstance.isSignedIn.listen(updateSigninStatus);
-            updateSigninStatus(authInstance.isSignedIn.get());
+    function handleClientLoad() {
+        gapi.load('client:auth2', () => {
+            gapi.client.init({
+                clientId: CLIENT_ID,
+                discoveryDocs: DISCOVERY_DOCS,
+                scope: SCOPES
+            }).then(() => {
+                const auth = gapi.auth2.getAuthInstance();
+                auth.isSignedIn.listen(updateStatus);
+                updateStatus(auth.isSignedIn.get());
+            }).catch(err => {
+                document.getElementById('status-bar').innerText = "ERROR DE CONEXIÓN";
+                console.error(err);
+            });
         });
     }
 
-    function updateSigninStatus(isSignedIn) {
+    function updateStatus(isSignedIn) {
+        const btn = document.getElementById('sync-btn');
         if (isSignedIn) {
-            document.getElementById('login-btn').style.display = 'none';
-            document.getElementById('status-bar').innerText = "ONLINE // " + gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getEmail();
+            btn.innerText = "CLOUD ACTIVE";
+            btn.style.background = "#34A853";
+            document.getElementById('status-bar').innerText = "ONLINE // PROTOCOLO SINCRONIZADO";
             loadFromDrive();
         } else {
-            document.getElementById('status-bar').innerText = "OFFLINE // REQUIERE LOGIN";
+            btn.innerText = "CLOUD SYNC (OFFLINE)";
+            btn.style.background = "#4285F4";
         }
     }
 
-    function handleAuthClick() { gapi.auth2.getAuthInstance().signIn(); }
+    function handleAuthClick() {
+        const auth = gapi.auth2.getAuthInstance();
+        if (auth.isSignedIn.get()) {
+            saveToDrive();
+        } else {
+            auth.signIn();
+        }
+    }
 
     async function saveToDrive() {
+        if (!gapi.auth2.getAuthInstance().isSignedIn.get()) return;
         const content = JSON.stringify(protocol);
         const metadata = { 'name': 'bio_protocol.json', 'mimeType': 'application/json' };
         const boundary = 'foo';
+        
+        const method = driveFileId ? 'PATCH' : 'POST';
+        const path = driveFileId ? `/upload/drive/v3/files/${driveFileId}` : '/upload/drive/v3/files';
+
         const request = gapi.client.request({
-            path: driveFileId ? `/upload/drive/v3/files/${driveFileId}` : '/upload/drive/v3/files',
-            method: driveFileId ? 'PATCH' : 'POST',
+            path: path,
+            method: method,
             params: { uploadType: 'multipart' },
             headers: { 'Content-Type': 'multipart/related; boundary=' + boundary },
             body: `--${boundary}\nContent-Type: application/json; charset=UTF-8\n\n${JSON.stringify(metadata)}\n--${boundary}\nContent-Type: application/json\n\n${content}\n--${boundary}--`
         });
-        request.execute(f => { driveFileId = f.id; document.getElementById('status-bar').innerText = "CLOUD SYNCED OK"; });
+        
+        request.execute(res => {
+            if (res.id) {
+                driveFileId = res.id;
+                document.getElementById('status-bar').innerText = "GUARDADO EN DRIVE: " + new Date().toLocaleTimeString();
+            }
+        });
     }
 
     async function loadFromDrive() {
-        const res = await gapi.client.drive.files.list({ q: "name = 'bio_protocol.json'" });
-        if (res.result.files.length > 0) {
+        const res = await gapi.client.drive.files.list({ q: "name = 'bio_protocol.json' and trashed = false" });
+        if (res.result.files && res.result.files.length > 0) {
             driveFileId = res.result.files[0].id;
             const file = await gapi.client.drive.files.get({ fileId: driveFileId, alt: 'media' });
-            protocol = file.result || [];
-            render();
+            if (file.result) {
+                protocol = file.result;
+                render();
+            }
         }
     }
 
-    // --- UI LOGIC ---
     function updateUI() {
         const t = document.getElementById('type').value;
         document.getElementById('comp-name').innerHTML = db[t].map(c => `<option value="${c.n}">${c.n}</option>`).join('');
@@ -149,8 +165,7 @@
 
     function addItem() {
         const t = document.getElementById('type').value;
-        const name = document.getElementById('comp-name').value;
-        const val = parseFloat(document.getElementById('input_val').value);
+        const val = parseFloat(document.getElementById('input_val').value) || 0;
         let dose = val; let ml = 0;
 
         if (t === 'aceite') {
@@ -163,7 +178,7 @@
         }
 
         protocol.push({
-            id: Date.now(), type: t, name, dose, ml,
+            id: Date.now(), type: t, name: document.getElementById('comp-name').value, dose, ml,
             unit: (t === 'peptido' ? 'mcg' : (t === 'hormona' ? 'UI' : 'mg')),
             checks: new Array(31).fill(false), color: colors[protocol.length % colors.length]
         });
@@ -175,7 +190,6 @@
         container.innerHTML = "";
         const aceites = protocol.filter(i => i.type === 'aceite');
         const otros = protocol.filter(i => i.type !== 'aceite');
-
         if(aceites.length > 0) renderCard(container, "JERINGA ACEITES", aceites, "syringe");
         otros.forEach(i => renderCard(container, i.name, [i], i.type === 'oral' ? "pill" : "syringe"));
     }
@@ -185,7 +199,6 @@
         const ref = items[0];
         const card = document.createElement('div');
         card.className = 'admin-card';
-
         card.innerHTML = `
             <button class="btn-del" onclick="removeItem(${ref.id})">✖</button>
             <div class="visual-row">
@@ -197,9 +210,7 @@
                             return `<div class="fluid-v" style="height:${h}%; bottom:${bottom}%; background:${i.color}"></div>`;
                         }).join('')}
                     </div>
-                ` : `
-                    <div class="pill-v"><div class="pill-fill"></div></div>
-                `}
+                ` : `<div class="pill-v"><div class="pill-fill"></div></div>`}
                 <div style="flex:1">
                     <p style="font-size:0.6rem; color:var(--blue); margin:0">${title}</p>
                     <b style="font-size:1.1rem; color:var(--green)">${totalMl > 0 ? totalMl.toFixed(2) + ' ml' : ref.dose + ' ' + ref.unit}</b>
@@ -214,14 +225,11 @@
         const item = protocol.find(i => i.id === id);
         if (item.type === 'aceite') protocol.filter(i => i.type === 'aceite').forEach(i => i.checks[day] = !i.checks[day]);
         else item.checks[day] = !item.checks[day];
-        if(navigator.vibrate) navigator.vibrate(40);
         saveToDrive(); render();
     }
 
     function removeItem(id) { protocol = protocol.filter(i => i.id !== id); saveToDrive(); render(); }
-    
     updateUI();
-    handleClientLoad();
 </script>
 </body>
 </html>
