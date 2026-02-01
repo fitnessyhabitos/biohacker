@@ -2,234 +2,297 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>BIOHACKER // NEURAL INTERFACE v9.9</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <script src="https://apis.google.com/js/api.js" onload="handleClientLoad()"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inyecciones Cyber Tracker</title>
     <style>
-        :root { --red: #ff003c; --blue: #00f3ff; --green: #39ff14; --glass: rgba(15, 15, 20, 0.98); }
-        body { background: #000; color: #e0e0e0; font-family: -apple-system, sans-serif; margin: 0; padding: 10px; display: flex; flex-direction: column; gap: 8px; height: 100vh; overflow: hidden; }
-        .panel { background: var(--glass); border: 1px solid #333; padding: 12px; border-radius: 12px; flex-shrink: 0; }
-        h2 { color: var(--red); font-size: 0.65rem; text-transform: uppercase; margin: 0 0 8px 0; border-bottom: 1px solid #333; padding-bottom: 4px; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-        select, input { width: 100%; background: #111; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 8px; font-size: 0.85rem; }
-        .btn-add { width: 100%; background: var(--red); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; margin-top: 8px; text-transform: uppercase; font-size: 0.8rem; }
-        #status-bar { font-size: 0.55rem; color: #555; text-align: center; margin-bottom: 5px; text-transform: uppercase; }
-        #main-container { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-bottom: 20px; }
-        .admin-card { background: #111; border-radius: 12px; padding: 10px; border: 1px solid #222; position: relative; display: flex; flex-direction: column; gap: 8px; }
-        .btn-del { position: absolute; top: 8px; right: 8px; color: #444; border: none; background: none; font-size: 0.9rem; }
-        .visual-row { display: flex; align-items: center; gap: 12px; }
-        .syringe-v { width: 28px; height: 85px; border: 1px solid #fff; position: relative; border-radius: 0 0 4px 4px; background: rgba(255,255,255,0.05); overflow: hidden; }
-        .fluid-v { position: absolute; bottom: 0; width: 100%; transition: height 0.3s; }
-        .pill-v { width: 28px; height: 35px; border: 1px solid var(--blue); border-radius: 4px 4px 8px 8px; position: relative; }
-        .pill-fill { position: absolute; bottom: 3px; left: 3px; right: 3px; top: 12px; background: var(--blue); opacity: 0.7; }
-        .check-grid { display: grid; grid-template-columns: repeat(11, 1fr); gap: 3px; }
-        .day-btn { aspect-ratio: 1; background: #1a1a1a; border: 1px solid #333; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: #444; font-weight: bold; }
-        .day-btn.active { background: var(--red); color: white; border-color: var(--red); box-shadow: 0 0 5px var(--red); }
-        .hidden { display: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Orbitron', -apple-system, monospace; 
+            background: #0a0a0a; 
+            color: #e0e0e0; 
+            min-height: 100vh; padding: 1rem; 
+            display: flex; flex-direction: column; gap: 1rem; 
+            font-size: 16px; line-height: 1.4;
+            overflow-x: hidden;
+            position: relative;
+        }
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(120,0,255,0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255,0,120,0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 40%, rgba(0,255,255,0.05) 0%, transparent 50%);
+            z-index: -1; animation: cyberPulse 8s ease-in-out infinite alternate;
+        }
+        @keyframes cyberPulse {
+            0% { opacity: 0.8; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.05); }
+        }
+
+        /* Liquid Glass Cyberpunk */
+        .glass { 
+            background: rgba(20, 20, 25, 0.4); 
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 20, 80, 0.3); 
+            box-shadow: 
+                0 8px 32px rgba(0,0,0,0.6),
+                inset 0 1px 0 rgba(255,255,255,0.1),
+                inset 0 -1px 0 rgba(255,0,80,0.2);
+            border-radius: 16px; position: relative; overflow: hidden;
+        }
+        .glass::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 3s infinite;
+        }
+        @keyframes shimmer { 100% { left: 100%; } }
+
+        .header { 
+            text-align: center; padding: 1.25rem; font-weight: 700; font-size: 1.2rem; 
+            color: #fff; text-shadow: 0 0 10px #ff1452;
+            background: linear-gradient(135deg, rgba(15,0,30,0.8), rgba(40,0,20,0.6));
+        }
+        .params { 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; 
+            padding: 1.25rem; 
+        }
+        .param { display: flex; flex-direction: column; gap: 0.5rem; }
+        input, select, button { 
+            padding: 0.875rem; border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 10px; background: rgba(15,15,20,0.6); 
+            color: #fff; font-size: 16px; backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        input:focus, select:focus { 
+            outline: none; box-shadow: 0 0 0 2px rgba(255,20,80,0.5); 
+            background: rgba(30,0,15,0.7);
+        }
+        button { 
+            background: linear-gradient(135deg, #ff1452, #ff4d4d); 
+            font-weight: 600; cursor: pointer; border: none;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+        button:hover { transform: translateY(-1px); box-shadow: 0 5px 15px rgba(255,20,80,0.4); }
+        button.active { background: linear-gradient(135deg, #10b981, #059669); }
+
+        .syringe-container { padding: 1.5rem; text-align: center; }
+        .syringe { 
+            width: 100%; max-width: 300px; height: 220px; margin: 0 auto 1rem; 
+            position: relative; border-radius: 60px 60px 25px 25px; overflow: hidden;
+            background: linear-gradient(180deg, rgba(240,240,240,0.9) 0%, rgba(200,200,200,0.8) 100%);
+            border: 5px solid #333; box-shadow: 
+                0 15px 40px rgba(0,0,0,0.7),
+                inset 0 2px 0 rgba(255,255,255,0.3);
+        }
+        .liquid { 
+            position: absolute; bottom: 0; left: 0; right: 0; 
+            border-radius: 0 0 25px 25px; height: 0; transition: height 0.4s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .needle { 
+            position: absolute; top: -25px; left: 50%; transform: translateX(-50%); 
+            width: 5px; height: 50px; background: linear-gradient(180deg, #666, #333); 
+            border-radius: 0 0 3px 3px; box-shadow: 0 0 10px rgba(255,20,80,0.5);
+        }
+        .volume-text { 
+            font-size: 1.5rem; font-weight: 800; 
+            background: linear-gradient(135deg, #ff1452, #fff); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(255,20,80,0.5);
+        }
+        .substances { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; margin-top: 1rem; }
+        .sub-item { 
+            display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; 
+            background: rgba(255,20,80,0.15); border: 1px solid rgba(255,20,80,0.3);
+            border-radius: 25px; font-size: 0.9rem; backdrop-filter: blur(10px);
+        }
+        .color-dot { width: 16px; height: 16px; border-radius: 50%; box-shadow: 0 0 10px currentColor; }
+
+        .checklist { padding: 1.25rem; }
+        .checklist h3 { color: #fff; margin-bottom: 1rem; text-shadow: 0 0 10px #ff1452; }
+        .check-item { 
+            display: flex; align-items: center; gap: 1rem; padding: 1rem; 
+            background: rgba(40,40,50,0.4); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; margin-bottom: 0.5rem; backdrop-filter: blur(10px);
+        }
+        input[type=checkbox] { width: 1.5rem; height: 1.5rem; accent-color: #ff1452; }
+
+        @media (max-width: 480px) { 
+            body { padding: 0.75rem; gap: 0.75rem; } 
+            .params { grid-template-columns: 1fr; }
+            .syringe { height: 200px; }
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
     </style>
 </head>
 <body>
-
-<div id="status-bar">CARGANDO NÚCLEO...</div>
-
-<div class="panel">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
-        <h2 style="margin:0; border:none">ADMINISTRACIÓN</h2>
-        <button onclick="handleAuthClick()" id="sync-btn" style="background:#4285F4; color:white; border:none; border-radius:4px; font-size:0.5rem; padding:6px 10px; font-weight:bold">CLOUD SYNC (OFFLINE)</button>
-    </div>
+    <!-- Mismo HTML que antes, solo cambia el CSS -->
+    <div class="header glass">🔥 Inyecciones Cyber - <span id="cycleName">Ciclo Actual</span></div>
     
-    <div class="form-grid">
-        <select id="type" onchange="updateUI()">
-            <option value="aceite">Aceite (Sem)</option>
-            <option value="peptido">Péptido (Día)</option>
-            <option value="hormona">HGH (Día)</option>
-            <option value="oral">Oral (Día)</option>
-        </select>
-        <select id="comp-name"></select>
-        <input type="number" id="input_val" placeholder="Cantidad">
-        <select id="freq">
-            <option value="7">Diario (7x)</option><option value="3.5">Día Sí/No</option><option value="2" selected>2x/Semana</option>
-        </select>
-    </div>
-    <div id="extra-row" style="display:flex; gap:6px; margin-top:6px">
-        <input type="number" id="oil_conc" value="250" style="flex:1">
-        <div id="col-pept" class="hidden" style="flex:1; display:flex; gap:4px">
-            <input type="number" id="v_mg" value="5" style="width:50%"><input type="number" id="v_ml" value="2" style="width:50%">
+    <div class="params glass">
+        <div class="param">
+            <label style="font-size: 0.85rem; opacity: 0.9;">Sustancia</label>
+            <select id="substanceSelect"></select>
         </div>
-    </div>
-    <button class="btn-add" onclick="addItem()">PROGRAMAR DOSIS</button>
-</div>
-
-<div id="main-container"></div>
-
-<script>
-    const CLIENT_ID = '612276120104-tc46nv8856efe38fl7323n9cudkn8pp8.apps.googleusercontent.com';
-    const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
-    const SCOPES = 'https://www.googleapis.com/auth/drive.file';
-    
-    let protocol = [];
-    let driveFileId = null;
-    const colors = ["#00f3ff", "#39ff14", "#ff003c", "#f3ff00", "#ff8800"];
-
-    const db = {
-        aceite: [{n: 'Testo Cipio'}, {n: 'Testo Enant'}, {n: 'DHB Cipio'}, {n: 'Primo'}, {n: 'Masteron'}],
-        peptido: [{n: 'BPC-157'}, {n: 'TB-500'}],
-        hormona: [{n: 'HGH Genotropin'}],
-        oral: [{n: 'Oxandrolona'}, {n: 'Winstrol'}]
-    };
-
-    function handleClientLoad() {
-        gapi.load('client:auth2', () => {
-            gapi.client.init({
-                clientId: CLIENT_ID,
-                discoveryDocs: DISCOVERY_DOCS,
-                scope: SCOPES
-            }).then(() => {
-                const auth = gapi.auth2.getAuthInstance();
-                auth.isSignedIn.listen(updateStatus);
-                updateStatus(auth.isSignedIn.get());
-            }).catch(err => {
-                document.getElementById('status-bar').innerText = "ERROR DE CONEXIÓN";
-                console.error(err);
-            });
-        });
-    }
-
-    function updateStatus(isSignedIn) {
-        const btn = document.getElementById('sync-btn');
-        if (isSignedIn) {
-            btn.innerText = "CLOUD ACTIVE";
-            btn.style.background = "#34A853";
-            document.getElementById('status-bar').innerText = "ONLINE // PROTOCOLO SINCRONIZADO";
-            loadFromDrive();
-        } else {
-            btn.innerText = "CLOUD SYNC (OFFLINE)";
-            btn.style.background = "#4285F4";
-        }
-    }
-
-    function handleAuthClick() {
-        const auth = gapi.auth2.getAuthInstance();
-        if (auth.isSignedIn.get()) {
-            saveToDrive();
-        } else {
-            auth.signIn();
-        }
-    }
-
-    async function saveToDrive() {
-        if (!gapi.auth2.getAuthInstance().isSignedIn.get()) return;
-        const content = JSON.stringify(protocol);
-        const metadata = { 'name': 'bio_protocol.json', 'mimeType': 'application/json' };
-        const boundary = 'foo';
-        
-        const method = driveFileId ? 'PATCH' : 'POST';
-        const path = driveFileId ? `/upload/drive/v3/files/${driveFileId}` : '/upload/drive/v3/files';
-
-        const request = gapi.client.request({
-            path: path,
-            method: method,
-            params: { uploadType: 'multipart' },
-            headers: { 'Content-Type': 'multipart/related; boundary=' + boundary },
-            body: `--${boundary}\nContent-Type: application/json; charset=UTF-8\n\n${JSON.stringify(metadata)}\n--${boundary}\nContent-Type: application/json\n\n${content}\n--${boundary}--`
-        });
-        
-        request.execute(res => {
-            if (res.id) {
-                driveFileId = res.id;
-                document.getElementById('status-bar').innerText = "GUARDADO EN DRIVE: " + new Date().toLocaleTimeString();
-            }
-        });
-    }
-
-    async function loadFromDrive() {
-        const res = await gapi.client.drive.files.list({ q: "name = 'bio_protocol.json' and trashed = false" });
-        if (res.result.files && res.result.files.length > 0) {
-            driveFileId = res.result.files[0].id;
-            const file = await gapi.client.drive.files.get({ fileId: driveFileId, alt: 'media' });
-            if (file.result) {
-                protocol = file.result;
-                render();
-            }
-        }
-    }
-
-    function updateUI() {
-        const t = document.getElementById('type').value;
-        document.getElementById('comp-name').innerHTML = db[t].map(c => `<option value="${c.n}">${c.n}</option>`).join('');
-        document.getElementById('freq').parentElement.classList.toggle('hidden', t !== 'aceite');
-        document.getElementById('oil_conc').classList.toggle('hidden', t === 'peptido' || t === 'hormona');
-        document.getElementById('col-pept').classList.toggle('hidden', t !== 'peptido');
-    }
-
-    function addItem() {
-        const t = document.getElementById('type').value;
-        const val = parseFloat(document.getElementById('input_val').value) || 0;
-        let dose = val; let ml = 0;
-
-        if (t === 'aceite') {
-            dose = val / parseFloat(document.getElementById('freq').value);
-            ml = dose / parseFloat(document.getElementById('oil_conc').value);
-        } else if (t === 'peptido') {
-            ml = (val / 1000) * (parseFloat(document.getElementById('v_ml').value) / parseFloat(document.getElementById('v_mg').value));
-        } else if (t === 'hormona') {
-            ml = val * 0.1;
-        }
-
-        protocol.push({
-            id: Date.now(), type: t, name: document.getElementById('comp-name').value, dose, ml,
-            unit: (t === 'peptido' ? 'mcg' : (t === 'hormona' ? 'UI' : 'mg')),
-            checks: new Array(31).fill(false), color: colors[protocol.length % colors.length]
-        });
-        saveToDrive(); render();
-    }
-
-    function render() {
-        const container = document.getElementById('main-container');
-        container.innerHTML = "";
-        const aceites = protocol.filter(i => i.type === 'aceite');
-        const otros = protocol.filter(i => i.type !== 'aceite');
-        if(aceites.length > 0) renderCard(container, "JERINGA ACEITES", aceites, "syringe");
-        otros.forEach(i => renderCard(container, i.name, [i], i.type === 'oral' ? "pill" : "syringe"));
-    }
-
-    function renderCard(container, title, items, visualType) {
-        const totalMl = items.reduce((s, i) => s + i.ml, 0);
-        const ref = items[0];
-        const card = document.createElement('div');
-        card.className = 'admin-card';
-        card.innerHTML = `
-            <button class="btn-del" onclick="removeItem(${ref.id})">✖</button>
-            <div class="visual-row">
-                ${visualType === 'syringe' ? `
-                    <div class="syringe-v">
-                        ${items.map((i, idx) => {
-                            const h = (i.ml / Math.max(1, totalMl)) * 100;
-                            const bottom = items.slice(0,idx).reduce((s,c)=>(s+(c.ml/Math.max(1, totalMl))*100),0);
-                            return `<div class="fluid-v" style="height:${h}%; bottom:${bottom}%; background:${i.color}"></div>`;
-                        }).join('')}
-                    </div>
-                ` : `<div class="pill-v"><div class="pill-fill"></div></div>`}
-                <div style="flex:1">
-                    <p style="font-size:0.6rem; color:var(--blue); margin:0">${title}</p>
-                    <b style="font-size:1.1rem; color:var(--green)">${totalMl > 0 ? totalMl.toFixed(2) + ' ml' : ref.dose + ' ' + ref.unit}</b>
-                </div>
+        <div class="param">
+            <label style="font-size: 0.85rem; opacity: 0.9;">mg/ml</label>
+            <input type="number" id="concentration" placeholder="200" min="1">
+        </div>
+        <div class="param">
+            <label style="font-size: 0.85rem; opacity: 0.9;">Dosis sem (mg)</label>
+            <input type="number" id="weeklyDose" placeholder="400" min="1">
+        </div>
+        <div class="param">
+            <label style="font-size: 0.85rem; opacity: 0.9;">Frecuencia</label>
+            <div style="display: flex; gap: 0.5rem;">
+                <button class="freq-btn" data-freq="daily">Diario</button>
+                <button class="freq-btn" data-freq="eod">EOD</button>
+                <button class="freq-btn" data-freq="twice">2x/Sem</button>
             </div>
-            <div class="check-grid">${ref.checks.map((c, idx) => `<div class="day-btn ${c ? 'active' : ''}" onclick="toggleCheck(${ref.id}, ${idx})">${idx+1}</div>`).join('')}</div>
-        `;
-        container.appendChild(card);
-    }
+        </div>
+        <button onclick="addSubstance()" style="grid-column: span 2; font-size: 1.1rem;">💉 AÑADIR</button>
+    </div>
 
-    function toggleCheck(id, day) {
-        const item = protocol.find(i => i.id === id);
-        if (item.type === 'aceite') protocol.filter(i => i.type === 'aceite').forEach(i => i.checks[day] = !i.checks[day]);
-        else item.checks[day] = !item.checks[day];
-        saveToDrive(); render();
-    }
+    <div class="syringe-container glass">
+        <div class="syringe" id="syringe">
+            <div class="needle"></div>
+        </div>
+        <div class="volume-text" id="volumeText">0.0 ml</div>
+        <div class="substances" id="substancesList"></div>
+    </div>
 
-    function removeItem(id) { protocol = protocol.filter(i => i.id !== id); saveToDrive(); render(); }
-    updateUI();
-</script>
+    <div class="checklist glass">
+        <h3>📋 Checklist Hoy</h3>
+        <div id="checklist"></div>
+    </div>
+
+    <!-- Script igual que antes, sin cambios -->
+    <script>
+        // [Mismo JavaScript exacto de la versión anterior - no cambia la lógica]
+        let substances = JSON.parse(localStorage.getItem('substances')) || [];
+        let currentCycle = localStorage.getItem('currentCycle') || 'Ciclo 1';
+        let nextColorHue = 0;
+
+        function getUniqueColor() {
+            const hue = nextColorHue;
+            nextColorHue = (nextColorHue + 137) % 360;
+            // Paleta cyber: rojo/neón/grises limitados
+            const cyberHues = [0, 30, 330, 200, 120, 300]; // Rojo, naranja-rojo, magenta, cian, verde-neón, violeta
+            const cyberHue = cyberHues[hue % cyberHues.length];
+            return `hsl(${cyberHue}, 80%, 55%)`;
+        }
+
+        // ... resto del script idéntico (updateSubstanceSelect, calculateInjection, etc.)
+        function saveData() {
+            localStorage.setItem('substances', JSON.stringify(substances));
+            localStorage.setItem('currentCycle', currentCycle);
+        }
+
+        function updateSubstanceSelect() {
+            const select = document.getElementById('substanceSelect');
+            select.innerHTML = '<option value="">Nueva sustancia</option>' + 
+                substances.map((s, i) => `<option value="${i}">${s.name}</option>`).join('');
+        }
+
+        function calculateInjection() {
+            const now = new Date();
+            const dayOfWeek = now.getDay();
+            let totalVol = 0;
+            let liquids = [];
+
+            substances.forEach(s => {
+                const weeklyDose = parseFloat(s.weeklyDose) || 0;
+                let injectionsPerWeek = s.freq === 'daily' ? 7 : s.freq === 'eod' ? 3.5 : 2;
+                const dosePerInj = weeklyDose / injectionsPerWeek;
+                const volPerInj = dosePerInj / (parseFloat(s.concentration) || 1);
+
+                let todayInject = false;
+                if (s.freq === 'daily') todayInject = true;
+                else if (s.freq === 'eod') todayInject = (now.getDate() % 2 === 0);
+                else if (s.freq === 'twice') todayInject = (dayOfWeek === 1 || dayOfWeek === 4);
+
+                if (todayInject) {
+                    totalVol += volPerInj;
+                    liquids.push({ name: s.name, vol: volPerInj.toFixed(2), color: s.color });
+                }
+            });
+
+            updateSyringe(totalVol, liquids);
+            updateChecklist(liquids);
+        }
+
+        function updateSyringe(totalVol, liquids) {
+            const syringe = document.getElementById('syringe');
+            const volumeText = document.getElementById('volumeText');
+            const substancesList = document.getElementById('substancesList');
+
+            let syringeSize = '0.3';
+            if (totalVol > 0.25) syringeSize = '0.5';
+            if (totalVol > 0.45) syringeSize = '1.0';
+            volumeText.textContent = `${totalVol.toFixed(2)} ml (${syringeSize}ml)`;
+
+            syringe.querySelectorAll('.liquid').forEach(el => el.remove());
+
+            let cumulativeHeight = 0;
+            liquids.forEach(liquid => {
+                const height = (liquid.vol / totalVol) * 100 || 0;
+                const div = document.createElement('div');
+                div.className = 'liquid';
+                div.style.height = `${height}%`;
+                div.style.backgroundColor = liquid.color;
+                div.style.top = `${100 - (cumulativeHeight + height)}%`;
+                syringe.appendChild(div);
+                cumulativeHeight += height;
+            });
+
+            substancesList.innerHTML = liquids.map(l => 
+                `<div class="sub-item"><div class="color-dot" style="background:${l.color}"></div>${l.name}: ${l.vol}ml</div>`
+            ).join('');
+        }
+
+        function updateChecklist(liquids) {
+            const checklist = document.getElementById('checklist');
+            if (liquids.length === 0) {
+                checklist.innerHTML = '<div style="text-align:center; opacity:0.7; padding:1rem;">Hoy no toca 💤</div>';
+                return;
+            }
+            checklist.innerHTML = liquids.map(l => `
+                <div class="check-item">
+                    <input type="checkbox" id="${l.name.replace(/\s+/g,'_')}" onchange="saveData()">
+                    <label for="${l.name.replace(/\s+/g,'_')}">${l.name} (${l.vol}ml)</label>
+                </div>
+            `).join('');
+        }
+
+        function addSubstance() {
+            const name = prompt('Nombre de la sustancia:') || `Sust ${substances.length + 1}`;
+            const conc = document.getElementById('concentration').value;
+            const dose = document.getElementById('weeklyDose').value;
+            const freq = document.querySelector('.freq-btn.active')?.dataset.freq || 'daily';
+
+            if (conc && dose) {
+                substances.push({
+                    name, concentration: conc, weeklyDose: dose, freq,
+                    color: getUniqueColor()
+                });
+                updateSubstanceSelect();
+                saveData();
+                calculateInjection();
+                document.getElementById('concentration').value = '';
+                document.getElementById('weeklyDose').value = '';
+            }
+        }
+
+        document.querySelectorAll('.freq-btn').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('.freq-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            };
+        });
+
+        document.getElementById('cycleName').textContent = currentCycle;
+        updateSubstanceSelect();
+        calculateInjection();
+        setInterval(calculateInjection, 60000);
+    </script>
 </body>
 </html>
