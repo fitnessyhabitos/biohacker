@@ -4,197 +4,208 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inyecciones Cyber Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Orbitron', -apple-system, monospace; 
-            background: #0a0a0a; 
-            color: #e0e0e0; 
-            min-height: 100vh; padding: 1rem; 
-            display: flex; flex-direction: column; gap: 1rem; 
+        html, body { 
+            height: 100%; overflow: auto; 
+            font-family: 'Orbitron', monospace; 
+            background: #0a0a0a; color: #e0e0e0; 
+            padding: 1rem; display: flex; flex-direction: column; gap: 1rem; 
             font-size: 16px; line-height: 1.4;
-            overflow-x: hidden;
-            position: relative;
         }
         body::before {
             content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: radial-gradient(circle at 20% 80%, rgba(120,0,255,0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(255,0,120,0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 40% 40%, rgba(0,255,255,0.05) 0%, transparent 50%);
+                        radial-gradient(circle at 80% 20%, rgba(255,0,120,0.1) 0%, transparent 50%);
             z-index: -1; animation: cyberPulse 8s ease-in-out infinite alternate;
+            pointer-events: none;
         }
-        @keyframes cyberPulse {
-            0% { opacity: 0.8; transform: scale(1); }
-            100% { opacity: 1; transform: scale(1.05); }
-        }
+        @keyframes cyberPulse { 0%,100% { opacity: 0.8; } 50% { opacity: 1; } }
 
-        /* Liquid Glass Cyberpunk */
         .glass { 
-            background: rgba(20, 20, 25, 0.4); 
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 20, 80, 0.3); 
-            box-shadow: 
-                0 8px 32px rgba(0,0,0,0.6),
-                inset 0 1px 0 rgba(255,255,255,0.1),
-                inset 0 -1px 0 rgba(255,0,80,0.2);
-            border-radius: 16px; position: relative; overflow: hidden;
+            background: rgba(20, 20, 25, 0.5); 
+            backdrop-filter: blur(20px); border: 1px solid rgba(255, 20, 80, 0.4); 
+            box-shadow: 0 12px 40px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
+            border-radius: 20px; position: relative; overflow: hidden;
+            transition: all 0.3s ease;
         }
+        .glass:hover { transform: translateY(-2px); box-shadow: 0 20px 50px rgba(255,20,80,0.3); }
         .glass::before {
-            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-            animation: shimmer 3s infinite;
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, #ff1452, transparent);
+            animation: shimmer 4s infinite;
         }
         @keyframes shimmer { 100% { left: 100%; } }
 
-        .header { 
-            text-align: center; padding: 1.25rem; font-weight: 700; font-size: 1.2rem; 
-            color: #fff; text-shadow: 0 0 10px #ff1452;
-            background: linear-gradient(135deg, rgba(15,0,30,0.8), rgba(40,0,20,0.6));
+        .header { text-align: center; padding: 1.5rem; font-size: 1.3rem; color: #fff; 
+            text-shadow: 0 0 15px #ff1452; background: linear-gradient(135deg, rgba(15,5,20,0.9), rgba(50,10,20,0.7));
         }
-        .params { 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; 
-            padding: 1.25rem; 
-        }
+        .params { grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1.5rem; max-height: 35vh; overflow-y: auto; }
         .param { display: flex; flex-direction: column; gap: 0.5rem; }
+        label { font-size: 0.85rem; opacity: 0.9; }
         input, select, button { 
-            padding: 0.875rem; border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 10px; background: rgba(15,15,20,0.6); 
-            color: #fff; font-size: 16px; backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
+            padding: 1rem; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; 
+            background: rgba(15,15,20,0.7); color: #fff; font-size: 16px; 
+            backdrop-filter: blur(12px); transition: all 0.3s;
         }
-        input:focus, select:focus { 
-            outline: none; box-shadow: 0 0 0 2px rgba(255,20,80,0.5); 
-            background: rgba(30,0,15,0.7);
+        input:focus, select:focus { box-shadow: 0 0 0 3px rgba(255,20,80,0.4); background: rgba(35,10,20,0.8); }
+        button { background: linear-gradient(135deg, #ff1452, #ff4d88); font-weight: 700; cursor: pointer; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,20,80,0.5); }
+        button.active { background: linear-gradient(135deg, #00ff88, #00cc66); }
+        .freq-buttons { display: flex; gap: 0.5rem; }
+        .preset-list { 
+            grid-column: span 2; max-height: 20vh; overflow-y: auto; padding: 1rem; gap: 0.5rem;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
         }
-        button { 
-            background: linear-gradient(135deg, #ff1452, #ff4d4d); 
-            font-weight: 600; cursor: pointer; border: none;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-        }
-        button:hover { transform: translateY(-1px); box-shadow: 0 5px 15px rgba(255,20,80,0.4); }
-        button.active { background: linear-gradient(135deg, #10b981, #059669); }
+        .preset-btn { padding: 0.75rem; font-size: 0.85rem; background: rgba(255,20,80,0.2); }
 
-        .syringe-container { padding: 1.5rem; text-align: center; }
+        .syringe-container { padding: 2rem 1.5rem; text-align: center; flex-shrink: 0; }
         .syringe { 
-            width: 100%; max-width: 300px; height: 220px; margin: 0 auto 1rem; 
-            position: relative; border-radius: 60px 60px 25px 25px; overflow: hidden;
-            background: linear-gradient(180deg, rgba(240,240,240,0.9) 0%, rgba(200,200,200,0.8) 100%);
-            border: 5px solid #333; box-shadow: 
-                0 15px 40px rgba(0,0,0,0.7),
-                inset 0 2px 0 rgba(255,255,255,0.3);
+            width: 100%; max-width: 320px; height: 240px; margin: 0 auto 1.5rem; position: relative; 
+            border-radius: 70px 70px 30px 30px; overflow: hidden; background: linear-gradient(180deg, #f5f5f5 0%, #d0d0d0 100%);
+            border: 6px solid #2a2a2a; box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 3px 0 rgba(255,255,255,0.4);
         }
-        .liquid { 
-            position: absolute; bottom: 0; left: 0; right: 0; 
-            border-radius: 0 0 25px 25px; height: 0; transition: height 0.4s ease;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        .liquid { position: absolute; bottom: 0; left: 0; right: 0; border-radius: 0 0 30px 30px; 
+            height: 0; transition: height 0.5s cubic-bezier(0.4,0,0.2,1); box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+        .needle { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); 
+            width: 6px; height: 60px; background: linear-gradient(180deg, #555, #222); border-radius: 0 0 4px 4px;
+            box-shadow: 0 0 15px rgba(255,20,80,0.6);
         }
-        .needle { 
-            position: absolute; top: -25px; left: 50%; transform: translateX(-50%); 
-            width: 5px; height: 50px; background: linear-gradient(180deg, #666, #333); 
-            border-radius: 0 0 3px 3px; box-shadow: 0 0 10px rgba(255,20,80,0.5);
+        .volume-text { font-size: 1.8rem; font-weight: 900; background: linear-gradient(135deg, #ff1452, #fff); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 25px rgba(255,20,80,0.6); }
+        .substances { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin-top: 1.5rem; }
+        .sub-item { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.5rem; 
+            background: rgba(255,20,80,0.2); border: 1px solid rgba(255,20,80,0.4); border-radius: 30px;
+            backdrop-filter: blur(12px); font-weight: 600;
         }
-        .volume-text { 
-            font-size: 1.5rem; font-weight: 800; 
-            background: linear-gradient(135deg, #ff1452, #fff); 
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(255,20,80,0.5);
-        }
-        .substances { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; margin-top: 1rem; }
-        .sub-item { 
-            display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; 
-            background: rgba(255,20,80,0.15); border: 1px solid rgba(255,20,80,0.3);
-            border-radius: 25px; font-size: 0.9rem; backdrop-filter: blur(10px);
-        }
-        .color-dot { width: 16px; height: 16px; border-radius: 50%; box-shadow: 0 0 10px currentColor; }
+        .color-dot { width: 20px; height: 20px; border-radius: 50%; box-shadow: 0 0 15px currentColor; border: 2px solid #fff; }
 
-        .checklist { padding: 1.25rem; }
-        .checklist h3 { color: #fff; margin-bottom: 1rem; text-shadow: 0 0 10px #ff1452; }
-        .check-item { 
-            display: flex; align-items: center; gap: 1rem; padding: 1rem; 
-            background: rgba(40,40,50,0.4); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px; margin-bottom: 0.5rem; backdrop-filter: blur(10px);
+        .checklist { padding: 1.5rem; flex: 1; max-height: 30vh; overflow-y: auto; }
+        .checklist h3 { color: #fff; margin-bottom: 1.5rem; text-shadow: 0 0 15px #ff1452; font-size: 1.2rem; }
+        .check-item { display: flex; align-items: center; gap: 1.25rem; padding: 1.25rem; margin-bottom: 1rem;
+            background: rgba(40,40,60,0.6); border: 1px solid rgba(255,255,255,0.15); border-radius: 15px;
+            backdrop-filter: blur(12px); transition: all 0.3s;
         }
-        input[type=checkbox] { width: 1.5rem; height: 1.5rem; accent-color: #ff1452; }
+        .check-item:hover { background: rgba(255,20,80,0.15); }
+        input[type=checkbox] { width: 1.8rem; height: 1.8rem; accent-color: #ff1452; }
 
         @media (max-width: 480px) { 
             body { padding: 0.75rem; gap: 0.75rem; } 
             .params { grid-template-columns: 1fr; }
             .syringe { height: 200px; }
+            .preset-list { grid-template-columns: 1fr 1fr; }
         }
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
     </style>
 </head>
 <body>
-    <!-- Mismo HTML que antes, solo cambia el CSS -->
-    <div class="header glass">🔥 Inyecciones Cyber - <span id="cycleName">Ciclo Actual</span></div>
+    <div class="header glass">🔥 CYBER INYECCIONES - <span id="cycleName">Ciclo 1</span></div>
     
     <div class="params glass">
         <div class="param">
-            <label style="font-size: 0.85rem; opacity: 0.9;">Sustancia</label>
-            <select id="substanceSelect"></select>
+            <label>🧪 Sustancia</label>
+            <select id="substanceSelect">
+                <option value="">Seleccionar...</option>
+            </select>
         </div>
         <div class="param">
-            <label style="font-size: 0.85rem; opacity: 0.9;">mg/ml</label>
-            <input type="number" id="concentration" placeholder="200" min="1">
+            <label>⚗️ mg/ml</label>
+            <input type="number" id="concentration" placeholder="250" min="1">
         </div>
         <div class="param">
-            <label style="font-size: 0.85rem; opacity: 0.9;">Dosis sem (mg)</label>
-            <input type="number" id="weeklyDose" placeholder="400" min="1">
+            <label>📊 Dosis sem (mg)</label>
+            <input type="number" id="weeklyDose" placeholder="500" min="1">
         </div>
         <div class="param">
-            <label style="font-size: 0.85rem; opacity: 0.9;">Frecuencia</label>
-            <div style="display: flex; gap: 0.5rem;">
-                <button class="freq-btn" data-freq="daily">Diario</button>
+            <label>⏰ Frecuencia</label>
+            <div class="freq-buttons">
+                <button class="freq-btn active" data-freq="twice">2x/Sem</button>
                 <button class="freq-btn" data-freq="eod">EOD</button>
-                <button class="freq-btn" data-freq="twice">2x/Sem</button>
+                <button class="freq-btn" data-freq="daily">Diario</button>
             </div>
         </div>
-        <button onclick="addSubstance()" style="grid-column: span 2; font-size: 1.1rem;">💉 AÑADIR</button>
+        
+        <div class="preset-list">
+            <button class="preset-btn" onclick="loadPreset('Test E')">Test E 250mg/ml</button>
+            <button class="preset-btn" onclick="loadPreset('Deca')">Deca 200mg/ml</button>
+            <button class="preset-btn" onclick="loadPreset('Tren E')">Tren E 200mg/ml</button>
+            <button class="preset-btn" onclick="loadPreset('Masteron')">Masteron 100mg/ml</button>
+            <button class="preset-btn" onclick="loadPreset('Primo')">Primo 100mg/ml</button>
+            <button class="preset-btn" onclick="loadPreset('Eq')">Equipoise 300mg/ml</button>
+            <button class="preset-btn" onclick="loadPreset('NPP')">NPP 100mg/ml</button>
+            <button class="preset-btn" onclick="loadPreset('Test P')">Test Prop 100mg/ml</button>
+            <button class="preset-btn" onclick="loadPreset('Boldenone')">Boldenone 200mg/ml</button>
+            <button class="preset-btn" onclick="loadPreset('DHB')">DHB 100mg/ml</button>
+            <button class="preset-btn" onclick="loadPreset('Anadrol')">Anadrol 50mg/ml</button>
+            <button class="preset-btn" onclick="loadPreset('Dianabol')">Dbol 50mg/ml</button>
+        </div>
+        
+        <button onclick="addSubstance()" style="grid-column: span 2; padding: 1.25rem; font-size: 1.2rem;">💉 AÑADIR A CICLO</button>
     </div>
 
     <div class="syringe-container glass">
         <div class="syringe" id="syringe">
             <div class="needle"></div>
         </div>
-        <div class="volume-text" id="volumeText">0.0 ml</div>
+        <div class="volume-text" id="volumeText">Calculando...</div>
         <div class="substances" id="substancesList"></div>
     </div>
 
     <div class="checklist glass">
-        <h3>📋 Checklist Hoy</h3>
-        <div id="checklist"></div>
+        <h3>📋 Checklist - Hoy <span id="todayDate"></span></h3>
+        <div id="checklist">Añade sustancias para ver dosis de hoy</div>
     </div>
 
-    <!-- Script igual que antes, sin cambios -->
     <script>
-        // [Mismo JavaScript exacto de la versión anterior - no cambia la lógica]
+        // Preset compuestos anabólicos comunes [web:35][web:36][web:37][web:38][web:40]
+        const PRESETS = {
+            'Test E': { name: 'Testosterona Enantato', conc: 250, dose: 500, freq: 'twice' },
+            'Deca': { name: 'Deca Durabolin', conc: 200, dose: 400, freq: 'twice' },
+            'Tren E': { name: 'Trenbolona Enantato', conc: 200, dose: 300, freq: 'twice' },
+            'Masteron': { name: 'Masteron Propionato', conc: 100, dose: 400, freq: 'eod' },
+            'Primo': { name: 'Primobolan', conc: 100, dose: 400, freq: 'twice' },
+            'Eq': { name: 'Equipoise', conc: 300, dose: 600, freq: 'twice' },
+            'NPP': { name: 'NPP (Nandrolona Phenyl)', conc: 100, dose: 300, freq: 'eod' },
+            'Test P': { name: 'Testosterona Propionato', conc: 100, dose: 100, freq: 'eod' },
+            'Boldenone': { name: 'Boldenona', conc: 200, dose: 400, freq: 'twice' },
+            'DHB': { name: 'DHB (1-Test Cyp)', conc: 100, dose: 400, freq: 'eod' },
+            'Anadrol': { name: 'Anadrol/Oximetolona', conc: 50, dose: 50, freq: 'daily' },
+            'Dianabol': { name: 'Dianabol/Metandrostenolona', conc: 50, dose: 40, freq: 'daily' }
+        };
+
         let substances = JSON.parse(localStorage.getItem('substances')) || [];
         let currentCycle = localStorage.getItem('currentCycle') || 'Ciclo 1';
         let nextColorHue = 0;
+        let todayCheckboxes = {};
 
         function getUniqueColor() {
-            const hue = nextColorHue;
-            nextColorHue = (nextColorHue + 137) % 360;
-            // Paleta cyber: rojo/neón/grises limitados
-            const cyberHues = [0, 30, 330, 200, 120, 300]; // Rojo, naranja-rojo, magenta, cian, verde-neón, violeta
-            const cyberHue = cyberHues[hue % cyberHues.length];
-            return `hsl(${cyberHue}, 80%, 55%)`;
+            const cyberHues = [0, 30, 330, 200, 120, 300, 60, 180];
+            const hue = cyberHues[nextColorHue % cyberHues.length];
+            nextColorHue++;
+            return `hsl(${hue}, 80%, 55%)`;
         }
 
-        // ... resto del script idéntico (updateSubstanceSelect, calculateInjection, etc.)
         function saveData() {
             localStorage.setItem('substances', JSON.stringify(substances));
-            localStorage.setItem('currentCycle', currentCycle);
         }
 
         function updateSubstanceSelect() {
             const select = document.getElementById('substanceSelect');
-            select.innerHTML = '<option value="">Nueva sustancia</option>' + 
+            select.innerHTML = '<option value="">Seleccionar...</option>' + 
                 substances.map((s, i) => `<option value="${i}">${s.name}</option>`).join('');
+        }
+
+        function loadPreset(key) {
+            const preset = PRESETS[key];
+            document.getElementById('concentration').value = preset.conc;
+            document.getElementById('weeklyDose').value = preset.dose;
+            document.querySelector(`[data-freq="${preset.freq}"]`).click();
+            document.getElementById('substanceSelect').value = '';
         }
 
         function calculateInjection() {
             const now = new Date();
+            document.getElementById('todayDate').textContent = now.toLocaleDateString('es-ES', {weekday: 'short', day: 'numeric'});
             const dayOfWeek = now.getDay();
             let totalVol = 0;
             let liquids = [];
@@ -207,8 +218,8 @@
 
                 let todayInject = false;
                 if (s.freq === 'daily') todayInject = true;
-                else if (s.freq === 'eod') todayInject = (now.getDate() % 2 === 0);
-                else if (s.freq === 'twice') todayInject = (dayOfWeek === 1 || dayOfWeek === 4);
+                else if (s.freq === 'eod') todayInject = (now.getDate() % 2 === 1); // Simplificado
+                else if (s.freq === 'twice') todayInject = (dayOfWeek === 1 || dayOfWeek === 4); // Lun/Jue
 
                 if (todayInject) {
                     totalVol += volPerInj;
@@ -223,76 +234,105 @@
         function updateSyringe(totalVol, liquids) {
             const syringe = document.getElementById('syringe');
             const volumeText = document.getElementById('volumeText');
-            const substancesList = document.getElementById('substancesList');
+            const list = document.getElementById('substancesList');
 
-            let syringeSize = '0.3';
-            if (totalVol > 0.25) syringeSize = '0.5';
-            if (totalVol > 0.45) syringeSize = '1.0';
-            volumeText.textContent = `${totalVol.toFixed(2)} ml (${syringeSize}ml)`;
+            let syringeSize = totalVol <= 0.3 ? '0.3' : totalVol <= 0.8 ? '0.5' : '1.0';
+            volumeText.textContent = `${totalVol.toFixed(2)} ml (${syringeSize}ml jeringa)`;
 
-            syringe.querySelectorAll('.liquid').forEach(el => el.remove());
+            // Limpiar
+            syringe.innerHTML = '<div class="needle"></div>';
 
-            let cumulativeHeight = 0;
-            liquids.forEach(liquid => {
-                const height = (liquid.vol / totalVol) * 100 || 0;
+            let cumulative = 0;
+            liquids.forEach(l => {
+                const pct = totalVol > 0 ? (l.vol / totalVol) * 100 : 0;
                 const div = document.createElement('div');
                 div.className = 'liquid';
-                div.style.height = `${height}%`;
-                div.style.backgroundColor = liquid.color;
-                div.style.top = `${100 - (cumulativeHeight + height)}%`;
+                div.style.height = `${pct}%`;
+                div.style.background = `linear-gradient(to top, ${l.color}, ${adjustBrightness(l.color, 20)})`;
+                div.style.bottom = `${cumulative}%`;
                 syringe.appendChild(div);
-                cumulativeHeight += height;
+                cumulative += pct;
             });
 
-            substancesList.innerHTML = liquids.map(l => 
-                `<div class="sub-item"><div class="color-dot" style="background:${l.color}"></div>${l.name}: ${l.vol}ml</div>`
-            ).join('');
+            list.innerHTML = liquids.map(l => 
+                `<div class="sub-item">
+                    <div class="color-dot" style="background:${l.color}"></div>
+                    ${l.name}: <strong>${l.vol}ml</strong>
+                </div>`
+            ).join('') || '<div style="opacity:0.6;">No hay inyección hoy</div>';
+        }
+
+        function adjustBrightness(color, percent) {
+            const num = parseInt(color.replace("#",""),16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + 
+                (G<255?G<1?0:G:255)*0x100 + (B<255?B<1?0:B:255)).toString(16).slice(1);
         }
 
         function updateChecklist(liquids) {
             const checklist = document.getElementById('checklist');
             if (liquids.length === 0) {
-                checklist.innerHTML = '<div style="text-align:center; opacity:0.7; padding:1rem;">Hoy no toca 💤</div>';
+                checklist.innerHTML = '<div style="text-align:center; opacity:0.6; padding:2rem;">💤 Hoy NO toca inyectar</div>';
                 return;
             }
-            checklist.innerHTML = liquids.map(l => `
-                <div class="check-item">
-                    <input type="checkbox" id="${l.name.replace(/\s+/g,'_')}" onchange="saveData()">
-                    <label for="${l.name.replace(/\s+/g,'_')}">${l.name} (${l.vol}ml)</label>
-                </div>
-            `).join('');
+            checklist.innerHTML = liquids.map(l => {
+                const id = l.name.replace(/[^a-zA-Z0-9]/g, '_');
+                return `
+                    <div class="check-item">
+                        <input type="checkbox" id="${id}" ${todayCheckboxes[id] ? 'checked' : ''} 
+                               onchange="toggleCheck('${id}', this.checked)">
+                        <label for="${id}">${l.name} - ${l.vol}ml 💉</label>
+                    </div>`;
+            }).join('');
+        }
+
+        function toggleCheck(id, checked) {
+            todayCheckboxes[id] = checked;
+            saveData();
         }
 
         function addSubstance() {
-            const name = prompt('Nombre de la sustancia:') || `Sust ${substances.length + 1}`;
-            const conc = document.getElementById('concentration').value;
-            const dose = document.getElementById('weeklyDose').value;
-            const freq = document.querySelector('.freq-btn.active')?.dataset.freq || 'daily';
+            const selectVal = document.getElementById('substanceSelect').value;
+            const name = selectVal !== '' ? substances[selectVal].name : prompt('Nombre sustancia:') || 'Nueva';
+            const conc = parseFloat(document.getElementById('concentration').value) || 250;
+            const dose = parseFloat(document.getElementById('weeklyDose').value) || 500;
+            const freqBtn = document.querySelector('.freq-btn.active');
+            const freq = freqBtn ? freqBtn.dataset.freq : 'twice';
 
-            if (conc && dose) {
-                substances.push({
-                    name, concentration: conc, weeklyDose: dose, freq,
-                    color: getUniqueColor()
-                });
-                updateSubstanceSelect();
-                saveData();
-                calculateInjection();
-                document.getElementById('concentration').value = '';
-                document.getElementById('weeklyDose').value = '';
+            const substance = {
+                name, concentration: conc, weeklyDose: dose, freq,
+                color: getUniqueColor()
+            };
+
+            if (selectVal !== '') {
+                substances[selectVal] = substance;
+            } else {
+                substances.push(substance);
             }
+            updateSubstanceSelect();
+            saveData();
+            calculateInjection();
+            // Limpiar campos
+            document.getElementById('concentration').value = '';
+            document.getElementById('weeklyDose').value = '';
         }
 
+        // Eventos
         document.querySelectorAll('.freq-btn').forEach(btn => {
-            btn.onclick = () => {
+            btn.addEventListener('click', () => {
                 document.querySelectorAll('.freq-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-            };
+            });
         });
 
+        // Inicializar
         document.getElementById('cycleName').textContent = currentCycle;
         updateSubstanceSelect();
         calculateInjection();
-        setInterval(calculateInjection, 60000);
+        setInterval(calculateInjection, 30000); // Cada 30s
     </script>
 </body>
 </html>
