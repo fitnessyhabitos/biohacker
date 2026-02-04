@@ -2,65 +2,66 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>BIOHACKER // NEURAL INTERFACE v11.0</title>
+    <title>BIOHACKER // NEURAL INTERFACE v13.0</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://apis.google.com/js/api.js" onload="initGAPI()"></script>
     <style>
-        :root { --red: #ff003c; --blue: #00f3ff; --green: #39ff14; --bg: #050505; --panel: rgba(20, 20, 25, 0.98); }
+        :root { --red: #ff003c; --blue: #00f3ff; --green: #39ff14; --orange: #ff8800; --bg: #050505; --panel: rgba(20, 20, 25, 0.98); }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'SF Mono', monospace; }
         body { background: var(--bg); color: #e0e0e0; margin: 0; padding: calc(env(safe-area-inset-top) + 10px) 12px 10px 12px; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         
-        /* UI Componets */
         .panel { background: var(--panel); border: 1px solid #333; padding: 12px; border-radius: 16px; margin-bottom: 10px; }
-        .section-title { font-size: 10px; color: var(--red); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; display: flex; justify-content: space-between; }
+        .section-title { font-size: 10px; color: var(--red); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        input, select { width: 100%; background: #111; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 10px; font-size: 13px; }
+        input, select { width: 100%; background: #111; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 10px; font-size: 13px; outline: none; }
         .btn { border: none; padding: 12px; border-radius: 12px; font-weight: bold; text-transform: uppercase; cursor: pointer; }
         .btn-red { background: var(--red); color: white; width: 100%; }
-        .btn-tab { background: #222; color: #888; flex: 1; padding: 8px; border-radius: 0; border-bottom: 2px solid transparent; }
-        .btn-tab.active { color: var(--blue); border-bottom-color: var(--blue); background: #111; }
+        
+        /* Tabs v13 */
+        .tabs { display: flex; margin-bottom: 10px; border-radius: 10px; overflow: hidden; border: 1px solid #333; flex-shrink: 0; }
+        .btn-tab { background: #222; color: #888; flex: 1; padding: 10px; border: none; font-size: 9px; }
+        .btn-tab.active { color: var(--blue); background: #111; border-bottom: 2px solid var(--blue); }
 
-        /* Inventory List */
-        .stock-item { background: #151515; padding: 8px; border-radius: 8px; margin-bottom: 5px; display: flex; justify-content: space-between; font-size: 11px; }
-        .pill { padding: 2px 6px; border-radius: 4px; font-size: 9px; margin-left: 5px; }
-
-        /* Dashboard */
-        #main-scroll { flex: 1; overflow-y: auto; padding-bottom: 80px; }
-        .card { background: #111; border: 1px solid #222; border-radius: 18px; padding: 12px; margin-bottom: 10px; border-left: 3px solid var(--blue); }
+        /* Dashboard & Lists */
+        #main-scroll { flex: 1; overflow-y: auto; padding-bottom: 30px; }
+        .card { background: #111; border: 1px solid #222; border-radius: 18px; padding: 12px; margin-bottom: 10px; position: relative; }
         .calendar { display: grid; grid-template-columns: repeat(11, 1fr); gap: 4px; margin-top: 10px; }
-        .day { aspect-ratio: 1; background: #1a1a1a; border: 1px solid #333; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #555; }
-        .day.active { background: var(--red); color: white; box-shadow: 0 0 10px rgba(255,0,60,0.3); }
-
+        .day { aspect-ratio: 1; background: #1a1a1a; border: 1px solid #333; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #444; }
+        .day.active { background: var(--red); color: white; }
+        
+        /* Travel Module UI */
+        .travel-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #222; font-size: 12px; }
+        .travel-qty { color: var(--green); font-weight: bold; }
         .hidden { display: none; }
-        .tabs { display: flex; margin-bottom: 10px; border-radius: 10px; overflow: hidden; border: 1px solid #333; }
     </style>
 </head>
 <body>
 
 <div class="header" style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:10px; color:#555;">
-    <div><span id="dot" style="width:8px; height:8px; background:var(--red); border-radius:50%; display:inline-block;"></span> <span id="user">SYNC REQ</span></div>
-    <div onclick="handleAuth()" style="cursor:pointer">GOOGLE DRIVE CLOUD</div>
+    <div><span id="dot" style="width:8px; height:8px; background:var(--red); border-radius:50%; display:inline-block; margin-right:5px;"></span> <span id="user">DRIVE DISCONNECTED</span></div>
+    <div onclick="handleAuth()" style="color:var(--blue); font-weight:bold">SYNC CLOUD</div>
 </div>
 
 <div class="tabs">
     <button class="btn-tab active" id="tab-dash" onclick="showTab('dash')">DASHBOARD</button>
-    <button class="btn-tab" id="tab-prof" onclick="showTab('prof')">PERFIL & STOCK</button>
+    <button class="btn-tab" id="tab-prof" onclick="showTab('prof')">STOCK</button>
+    <button class="btn-tab" id="tab-logi" onclick="showTab('logi')">LOGÍSTICA</button>
 </div>
 
 <div id="view-dash" class="tab-view">
     <div class="panel">
-        <div class="section-title">PROGRAMAR TOMA</div>
+        <div class="section-title">NUEVO PROTOCOLO</div>
         <div class="grid">
-            <select id="sel-stock" onchange="updateDoseInfo()"></select>
+            <select id="sel-stock"></select>
             <select id="sel-freq">
-                <option value="7">ED (Diario)</option>
-                <option value="3.5">EOD (Alterno)</option>
+                <option value="7">Diario (ED)</option>
+                <option value="3.5">EOD</option>
                 <option value="2" selected>2x / Sem</option>
             </select>
-            <input type="number" id="inp-dose" placeholder="Dosis (mg/UI/Pill)">
-            <button class="btn btn-red" onclick="addToProtocol()" style="height:40px">ADD</button>
+            <input type="number" id="inp-dose" placeholder="Dosis">
+            <button class="btn btn-red" onclick="addToProtocol()">ADD</button>
         </div>
     </div>
     <div id="main-scroll"></div>
@@ -68,37 +69,41 @@
 
 <div id="view-prof" class="tab-view hidden">
     <div class="panel">
-        <div class="section-title">CONFIGURACIÓN PERFIL</div>
-        <label style="font-size:10px; color:#666">HORARIO NOTIFICACIÓN</label>
-        <input type="time" id="prof-time" value="09:00" onchange="updateConfig()">
-    </div>
-
-    <div class="panel">
-        <div class="section-title">AÑADIR AL INVENTARIO</div>
+        <div class="section-title">REGISTRO DE VIALES / CAJAS</div>
         <div class="grid" style="grid-template-columns: 1fr 1fr 1fr;">
             <input type="text" id="st-name" placeholder="Nombre" style="grid-column: span 3">
             <select id="st-type">
                 <option value="oil">Aceite (ml)</option>
-                <option value="pill">Pill (Pastilla)</option>
                 <option value="hgh">HGH (UI)</option>
                 <option value="pep">Pep (mcg)</option>
+                <option value="pill">Pills (u)</option>
             </select>
-            <input type="number" id="st-qty" placeholder="Stock Total">
-            <input type="number" id="st-conc" placeholder="Conc (mg/ml)">
-            <button class="btn btn-red" onclick="addStock()" style="grid-column: span 3; margin-top:5px">GUARDAR EN INVENTARIO</button>
+            <input type="number" id="st-qty" placeholder="Stock">
+            <input type="number" id="st-conc" placeholder="Conc">
+            <button class="btn btn-red" onclick="addStock()" style="grid-column: span 3; margin-top:5px">GUARDAR</button>
         </div>
-        <div id="inventory-list" style="margin-top:15px"></div>
+    </div>
+    <div id="inventory-display" style="overflow-y:auto;"></div>
+</div>
+
+<div id="view-logi" class="tab-view hidden">
+    <div class="panel">
+        <div class="section-title">PLANIFICADOR DE VIAJE</div>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <label style="font-size:11px;">DÍAS FUERA:</label>
+            <input type="number" id="travel-days" value="7" oninput="calcTravel()" style="width:80px;">
+        </div>
+    </div>
+    <div class="panel">
+        <div class="section-title">CHECKLIST DE MATERIAL</div>
+        <div id="travel-list"></div>
     </div>
 </div>
 
 <script>
     const CLIENT_ID = '612276120104-tc46nv8856efe38fl7323n9cudkn8pp8.apps.googleusercontent.com';
     let driveId = null;
-    let state = {
-        config: { time: '09:00' },
-        inventory: [], // { name, type, stock, conc, id }
-        protocol: []   // { stockId, freq, dose, checks, color }
-    };
+    let state = { inventory: [], protocol: [] };
 
     function initGAPI() {
         gapi.load('client:auth2', () => {
@@ -114,14 +119,13 @@
     function updateAuth(s) {
         if(s) {
             document.getElementById('dot').style.background = 'var(--green)';
-            document.getElementById('user').innerText = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getEmail();
+            document.getElementById('user').innerText = "V13 CONNECTED";
             loadData();
         }
     }
 
     function handleAuth() { gapi.auth2.getAuthInstance().signIn(); }
 
-    // --- Tab Management ---
     function showTab(tab) {
         document.querySelectorAll('.tab-view').forEach(v => v.classList.add('hidden'));
         document.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('active'));
@@ -129,135 +133,127 @@
         document.getElementById('tab-' + tab).classList.add('active');
         if(tab === 'dash') renderDashboard();
         if(tab === 'prof') renderInventory();
+        if(tab === 'logi') calcTravel();
     }
 
-    // --- Inventory Logic ---
+    // --- INVENTARIO ---
     function addStock() {
-        const item = {
-            id: Date.now(),
-            name: document.getElementById('st-name').value,
-            type: document.getElementById('st-type').value,
-            stock: parseFloat(document.getElementById('st-qty').value),
-            conc: parseFloat(document.getElementById('st-conc').value) || 0
-        };
+        const item = { id: Date.now(), name: document.getElementById('st-name').value, type: document.getElementById('st-type').value, 
+                       stock: parseFloat(document.getElementById('st-qty').value), initialStock: parseFloat(document.getElementById('st-qty').value), 
+                       conc: parseFloat(document.getElementById('st-conc').value) || 0 };
         if(!item.name) return;
         state.inventory.push(item);
-        renderInventory();
-        syncSelects();
-        saveData();
+        renderInventory(); syncSelects(); saveData();
     }
 
     function renderInventory() {
-        const list = document.getElementById('inventory-list');
-        list.innerHTML = state.inventory.map(i => `
-            <div class="stock-item">
-                <span><b>${i.name}</b> <span class="pill" style="background:#333">${i.type}</span></span>
-                <span>Stock: ${i.stock} | <span style="color:var(--red)" onclick="removeStock(${i.id})">DEL</span></span>
+        document.getElementById('inventory-display').innerHTML = state.inventory.map(i => `
+            <div class="panel">
+                <div style="display:flex; justify-content:space-between; font-size:12px"><b>${i.name}</b> <span onclick="removeStock(${i.id})" style="color:var(--red)">X</span></div>
+                <div style="width:100%; height:4px; background:#222; margin:8px 0;"><div style="width:${(i.stock/i.initialStock)*100}%; background:var(--blue); height:100%"></div></div>
+                <div style="font-size:10px; text-align:right">${i.stock.toFixed(2)} unidades rest.</div>
             </div>
         `).join('');
     }
 
-    function removeStock(id) {
-        state.inventory = state.inventory.filter(i => i.id !== id);
-        state.protocol = state.protocol.filter(p => p.stockId !== id);
-        renderInventory();
-        syncSelects();
-        saveData();
-    }
+    function syncSelects() { document.getElementById('sel-stock').innerHTML = state.inventory.map(i => `<option value="${i.id}">${i.name}</option>`).join(''); }
 
-    function syncSelects() {
-        const sel = document.getElementById('sel-stock');
-        sel.innerHTML = state.inventory.map(i => `<option value="${i.id}">${i.name}</option>`).join('');
-    }
+    // --- LOGÍSTICA (EL MOTOR DE VIAJE) ---
+    function calcTravel() {
+        const days = parseInt(document.getElementById('travel-days').value) || 0;
+        const list = document.getElementById('travel-list');
+        let html = '';
+        let totalInjections = 0;
+        let syringes = 0;
 
-    // --- Dashboard Logic ---
-    function addToProtocol() {
-        const stockId = parseInt(document.getElementById('sel-stock').value);
-        if(!stockId) return;
-        const dose = parseFloat(document.getElementById('inp-dose').value);
-        state.protocol.push({
-            id: Date.now(),
-            stockId: stockId,
-            freq: parseFloat(document.getElementById('sel-freq').value),
-            dose: dose,
-            checks: new Array(31).fill(false),
-            color: `hsl(${Math.random()*360}, 70%, 50%)`
+        // Agrupar aceites porque van en la misma jeringa
+        const oils = state.protocol.filter(p => state.inventory.find(i => i.id === p.stockId && i.type === 'oil'));
+        const others = state.protocol.filter(p => !oils.includes(p));
+
+        if(oils.length > 0) {
+            let weeklyInjections = oils[0].freq;
+            let tripInjections = Math.ceil((days / 7) * weeklyInjections);
+            syringes += tripInjections;
+            let totalOilVolume = 0;
+            oils.forEach(p => {
+                const inv = state.inventory.find(i => i.id === p.stockId);
+                totalOilVolume += (p.dose / inv.conc) * (days/7);
+            });
+            html += `<div class="travel-item"><span>Pack Aceites (Volumen Total)</span><span class="travel-qty">${totalOilVolume.toFixed(2)} ml</span></div>`;
+        }
+
+        others.forEach(p => {
+            const inv = state.inventory.find(i => i.id === p.stockId);
+            let tripDoses = Math.ceil((days / 7) * p.freq);
+            if(inv.type !== 'pill') syringes += tripDoses;
+            
+            let totalNeeded = p.dose * (days / 7) * p.freq;
+            if(inv.type === 'oil') totalNeeded = (p.dose / inv.conc) * (days / 7);
+
+            html += `<div class="travel-item"><span>${inv.name}</span><span class="travel-qty">${totalNeeded.toFixed(1)} ${inv.type === 'pill' ? 'u' : (inv.type === 'hgh' ? 'UI' : 'mg')}</span></div>`;
         });
+
+        html += `<div style="margin-top:15px; border-top:1px dashed #444; padding-top:10px"></div>`;
+        html += `<div class="travel-item"><span>Jeringas (Insulina/IM)</span><span class="travel-qty">${syringes} u</span></div>`;
+        html += `<div class="travel-item"><span>Toallitas Alcohol</span><span class="travel-qty">${syringes} u</span></div>`;
+
+        list.innerHTML = html || '<div style="font-size:10px; color:#555">No hay protocolo activo para calcular.</div>';
+    }
+
+    // --- DASHBOARD ---
+    function addToProtocol() {
+        state.protocol.push({ id: Date.now(), stockId: parseInt(document.getElementById('sel-stock').value), 
+                             freq: parseFloat(document.getElementById('sel-freq').value), dose: parseFloat(document.getElementById('inp-dose').value), 
+                             checks: new Array(31).fill(false), color: `hsl(${Math.random()*360}, 70%, 50%)` });
         saveData(); renderDashboard();
     }
 
     function renderDashboard() {
         const container = document.getElementById('main-scroll');
-        container.innerHTML = '';
-        state.protocol.forEach(p => {
+        container.innerHTML = state.protocol.map(p => {
             const inv = state.inventory.find(i => i.id === p.stockId);
-            if(!inv) return;
-            
-            let ml = 0;
-            if(inv.type === 'oil') ml = (p.dose / p.freq) / inv.conc;
-            if(inv.type === 'hgh') ml = p.dose * 0.1;
-            if(inv.type === 'pep') ml = p.dose / 1000; // Simplificado mcg->ml
-
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.style.borderLeftColor = p.color;
-            card.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center">
-                    <span style="font-weight:bold; color:var(--blue)">${inv.name}</span>
-                    <span style="color:var(--green)">${inv.type === 'pill' ? p.dose + ' pastilla' : ml.toFixed(2) + ' ml'}</span>
-                    <button onclick="removeProtocol(${p.id})" style="background:none; border:none; color:#444">×</button>
-                </div>
-                <div style="font-size:10px; color:#666; margin-top:4px">Dosis: ${p.dose}${inv.type==='pill'?'mg':inv.type==='hgh'?'UI':'mg'} | Restante: ${inv.stock.toFixed(1)}</div>
-                <div class="calendar">
-                    ${p.checks.map((c, idx) => `<div class="day ${c?'active':''}" onclick="toggleCheck(${p.id}, ${idx})">${idx+1}</div>`).join('')}
-                </div>
-            `;
-            container.appendChild(card);
-        });
+            return `
+                <div class="card" style="border-left:4px solid ${p.color}">
+                    <div style="display:flex; justify-content:space-between">
+                        <b>${inv.name}</b>
+                        <span style="color:var(--green); font-size:12px">${p.dose}${inv.type==='pill'?'u':inv.type==='hgh'?'UI':'mg'}</span>
+                    </div>
+                    <div class="calendar">${p.checks.map((c, idx) => `<div class="day ${c?'active':''}" onclick="toggleCheck(${p.id}, ${idx})">${idx+1}</div>`).join('')}</div>
+                    <button onclick="removeProtocol(${p.id})" style="margin-top:10px; background:none; border:none; color:#444; font-size:10px">ELIMINAR</button>
+                </div>`;
+        }).join('');
     }
 
     function toggleCheck(id, day) {
         const p = state.protocol.find(x => x.id === id);
         const inv = state.inventory.find(i => i.id === p.stockId);
-        
-        // Lógica de Stock: Si marca, resta. Si desmarca, suma.
-        if(!p.checks[day]) inv.stock -= (inv.type === 'oil' ? p.dose/p.freq : p.dose);
-        else inv.stock += (inv.type === 'oil' ? p.dose/p.freq : p.dose);
-
+        const discount = (inv.type === 'oil') ? (p.dose / p.freq) : p.dose;
+        p.checks[day] ? inv.stock += discount : inv.stock -= discount;
         p.checks[day] = !p.checks[day];
-        if(navigator.vibrate) navigator.vibrate(30);
         saveData(); renderDashboard();
     }
 
-    function removeProtocol(id) { state.protocol = state.protocol.filter(x => x.id !== id); saveData(); renderDashboard(); }
-
-    // --- Data Persistence ---
+    // --- DATA ---
     async function saveData() {
         if(!gapi.auth2.getAuthInstance().isSignedIn.get()) return;
-        const metadata = { 'name': 'bio_v11.json', 'mimeType': 'application/json' };
-        const boundary = 'v11_sync';
+        const metadata = { 'name': 'bio_v13.json', 'mimeType': 'application/json' };
+        const boundary = 'v13_deploy';
         const body = `--${boundary}\nContent-Type: application/json\n\n${JSON.stringify(metadata)}\n--${boundary}\nContent-Type: application/json\n\n${JSON.stringify(state)}\n--${boundary}--`;
-        gapi.client.request({
-            path: driveId ? `/upload/drive/v3/files/${driveId}` : '/upload/drive/v3/files',
-            method: driveId ? 'PATCH' : 'POST',
-            params: { uploadType: 'multipart' },
-            headers: { 'Content-Type': `multipart/related; boundary=${boundary}` },
-            body: body
-        }).execute(res => { driveId = res.id; });
+        gapi.client.request({ path: driveId ? `/upload/drive/v3/files/${driveId}` : '/upload/drive/v3/files', method: driveId ? 'PATCH' : 'POST', params: { uploadType: 'multipart' }, headers: { 'Content-Type': `multipart/related; boundary=${boundary}` }, body: body }).execute(res => { driveId = res.id; });
     }
 
     async function loadData() {
-        const res = await gapi.client.drive.files.list({ q: "name = 'bio_v11.json' and trashed = false" });
+        const res = await gapi.client.drive.files.list({ q: "name = 'bio_v13.json' and trashed = false" });
         if(res.result.files.length > 0) {
             driveId = res.result.files[0].id;
             const file = await gapi.client.drive.files.get({ fileId: driveId, alt: 'media' });
             state = file.result || state;
-            syncSelects();
-            renderDashboard();
-            renderInventory();
-            document.getElementById('prof-time').value = state.config.time;
+            syncSelects(); renderDashboard();
         }
     }
+
+    function removeProtocol(id) { state.protocol = state.protocol.filter(x => x.id !== id); saveData(); renderDashboard(); }
+    function removeStock(id) { state.inventory = state.inventory.filter(i => i.id !== id); state.protocol = state.protocol.filter(p => p.stockId !== id); syncSelects(); renderInventory(); saveData(); }
 </script>
 </body>
 </html>
