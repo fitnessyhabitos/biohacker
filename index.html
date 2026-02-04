@@ -2,296 +2,262 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>BIOHACKER // NEURAL INTERFACE v10.0</title>
+    <title>BIOHACKER // NEURAL INTERFACE v11.0</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://apis.google.com/js/api.js" onload="initGAPI()"></script>
     <style>
-        :root { 
-            --red: #ff003c; --blue: #00f3ff; --green: #39ff14; 
-            --bg: #050505; --panel: rgba(20, 20, 25, 0.95);
-            --safe-top: env(safe-area-inset-top);
-        }
+        :root { --red: #ff003c; --blue: #00f3ff; --green: #39ff14; --bg: #050505; --panel: rgba(20, 20, 25, 0.98); }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'SF Mono', monospace; }
+        body { background: var(--bg); color: #e0e0e0; margin: 0; padding: calc(env(safe-area-inset-top) + 10px) 12px 10px 12px; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            background: var(--bg); color: #e0e0e0; font-family: 'SF Mono', 'Menlo', monospace;
-            margin: 0; padding: calc(var(--safe-top) + 10px) 12px 10px 12px;
-            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
-        }
+        /* UI Componets */
+        .panel { background: var(--panel); border: 1px solid #333; padding: 12px; border-radius: 16px; margin-bottom: 10px; }
+        .section-title { font-size: 10px; color: var(--red); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; display: flex; justify-content: space-between; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        input, select { width: 100%; background: #111; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 10px; font-size: 13px; }
+        .btn { border: none; padding: 12px; border-radius: 12px; font-weight: bold; text-transform: uppercase; cursor: pointer; }
+        .btn-red { background: var(--red); color: white; width: 100%; }
+        .btn-tab { background: #222; color: #888; flex: 1; padding: 8px; border-radius: 0; border-bottom: 2px solid transparent; }
+        .btn-tab.active { color: var(--blue); border-bottom-color: var(--blue); background: #111; }
 
-        /* --- Header & Status --- */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
-        .online { background: var(--green); box-shadow: 0 0 8px var(--green); }
-        .offline { background: var(--red); }
+        /* Inventory List */
+        .stock-item { background: #151515; padding: 8px; border-radius: 8px; margin-bottom: 5px; display: flex; justify-content: space-between; font-size: 11px; }
+        .pill { padding: 2px 6px; border-radius: 4px; font-size: 9px; margin-left: 5px; }
 
-        /* --- Input Panel --- */
-        .panel { 
-            background: var(--panel); border: 1px solid #333; padding: 12px; border-radius: 16px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5); margin-bottom: 10px;
-        }
-        .grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        label { font-size: 10px; color: #666; text-transform: uppercase; margin-bottom: 2px; display: block; }
-        select, input { 
-            width: 100%; background: #111; border: 1px solid #444; color: #fff; 
-            padding: 10px; border-radius: 10px; font-size: 14px; outline: none;
-        }
-        .btn-main { 
-            width: 100%; background: var(--red); color: white; border: none; padding: 14px; 
-            border-radius: 12px; font-weight: 800; margin-top: 10px; text-transform: uppercase; letter-spacing: 1px;
-        }
-
-        /* --- Dashboard Area (Scrollable) --- */
-        #dashboard { flex: 1; overflow-y: auto; padding-right: 2px; }
-        #dashboard::-webkit-scrollbar { width: 0; }
-
-        /* --- Cards --- */
-        .card { 
-            background: #111; border: 1px solid #222; border-radius: 18px; padding: 12px; 
-            margin-bottom: 10px; position: relative; border-left: 3px solid var(--blue);
-        }
-        .card-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
-        .substance-name { font-weight: bold; color: var(--blue); font-size: 13px; }
-
-        /* --- Visualización Jeringa Pro --- */
-        .syringe-container { display: flex; align-items: center; gap: 15px; margin-bottom: 12px; }
-        .syringe-v { 
-            width: 32px; height: 100px; border: 2px solid #ddd; position: relative; 
-            border-radius: 0 0 6px 6px; background: rgba(255,255,255,0.03); flex-shrink: 0;
-        }
-        .syringe-v::after { content: ''; position: absolute; top: -10px; left: 50%; width: 4px; height: 10px; background: #ddd; transform: translateX(-50%); }
-        .fluid-segment { position: absolute; bottom: 0; width: 100%; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-        .pill-v { width: 32px; height: 40px; border: 2px solid var(--red); border-radius: 8px; position: relative; display: flex; align-items: center; justify-content: center; }
-
-        /* --- Calendar Grid --- */
-        .calendar { display: grid; grid-template-columns: repeat(11, 1fr); gap: 4px; }
-        .day { 
-            aspect-ratio: 1; background: #1a1a1a; border: 1px solid #333; border-radius: 5px; 
-            display: flex; align-items: center; justify-content: center; font-size: 9px; color: #555; font-weight: bold;
-        }
-        .day.active { background: var(--red); color: white; border-color: var(--red); box-shadow: 0 0 10px rgba(255,0,60,0.4); }
+        /* Dashboard */
+        #main-scroll { flex: 1; overflow-y: auto; padding-bottom: 80px; }
+        .card { background: #111; border: 1px solid #222; border-radius: 18px; padding: 12px; margin-bottom: 10px; border-left: 3px solid var(--blue); }
+        .calendar { display: grid; grid-template-columns: repeat(11, 1fr); gap: 4px; margin-top: 10px; }
+        .day { aspect-ratio: 1; background: #1a1a1a; border: 1px solid #333; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #555; }
+        .day.active { background: var(--red); color: white; box-shadow: 0 0 10px rgba(255,0,60,0.3); }
 
         .hidden { display: none; }
+        .tabs { display: flex; margin-bottom: 10px; border-radius: 10px; overflow: hidden; border: 1px solid #333; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <div><span id="dot" class="status-dot offline"></span> <span style="font-size: 10px; letter-spacing: 1px;" id="user-info">AUTH REQUIRED</span></div>
-    <button onclick="handleAuth()" id="auth-btn" style="background:none; border: 1px solid #444; color:#888; border-radius:6px; padding:4px 8px; font-size:9px;">SYNC DRIVE</button>
+<div class="header" style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:10px; color:#555;">
+    <div><span id="dot" style="width:8px; height:8px; background:var(--red); border-radius:50%; display:inline-block;"></span> <span id="user">SYNC REQ</span></div>
+    <div onclick="handleAuth()" style="cursor:pointer">GOOGLE DRIVE CLOUD</div>
 </div>
 
-<div class="panel">
-    <h2>NUEVA ENTRADA</h2>
-    <div class="grid-form">
-        <div>
-            <label>Categoría</label>
-            <select id="cat" onchange="syncSubstances()">
-                <option value="oil">Aceites (Sem)</option>
-                <option value="pep">Péptidos (Día)</option>
-                <option value="hgh">HGH (Día)</option>
-                <option value="oral">Oral (Día)</option>
-            </select>
-        </div>
-        <div>
-            <label>Compuesto</label>
-            <select id="subst"></select>
-        </div>
-        <div>
-            <label id="dose-label">Dosis Semanal (mg)</label>
-            <input type="number" id="val" placeholder="0.0">
-        </div>
-        <div id="freq-box">
-            <label>Frecuencia</label>
-            <select id="freq">
-                <option value="7">Diario (ED)</option>
-                <option value="3.5">EOD</option>
+<div class="tabs">
+    <button class="btn-tab active" id="tab-dash" onclick="showTab('dash')">DASHBOARD</button>
+    <button class="btn-tab" id="tab-prof" onclick="showTab('prof')">PERFIL & STOCK</button>
+</div>
+
+<div id="view-dash" class="tab-view">
+    <div class="panel">
+        <div class="section-title">PROGRAMAR TOMA</div>
+        <div class="grid">
+            <select id="sel-stock" onchange="updateDoseInfo()"></select>
+            <select id="sel-freq">
+                <option value="7">ED (Diario)</option>
+                <option value="3.5">EOD (Alterno)</option>
                 <option value="2" selected>2x / Sem</option>
             </select>
+            <input type="number" id="inp-dose" placeholder="Dosis (mg/UI/Pill)">
+            <button class="btn btn-red" onclick="addToProtocol()" style="height:40px">ADD</button>
         </div>
     </div>
-    <div id="extra-row" class="grid-form" style="margin-top:8px;">
-        <div id="conc-box">
-            <label>Concentración (mg/ml)</label>
-            <input type="number" id="conc" value="250">
-        </div>
-        <div id="dilution-box" class="hidden" style="grid-column: span 2; display: flex; gap: 8px;">
-            <div style="flex:1"><label>mg Vial</label><input type="number" id="v_mg" value="5"></div>
-            <div style="flex:1"><label>ml Agua</label><input type="number" id="v_ml" value="2"></div>
-        </div>
-    </div>
-    <button class="btn-main" onclick="addEntry()">Añadir al Protocolo</button>
+    <div id="main-scroll"></div>
 </div>
 
-<div id="dashboard"></div>
+<div id="view-prof" class="tab-view hidden">
+    <div class="panel">
+        <div class="section-title">CONFIGURACIÓN PERFIL</div>
+        <label style="font-size:10px; color:#666">HORARIO NOTIFICACIÓN</label>
+        <input type="time" id="prof-time" value="09:00" onchange="updateConfig()">
+    </div>
+
+    <div class="panel">
+        <div class="section-title">AÑADIR AL INVENTARIO</div>
+        <div class="grid" style="grid-template-columns: 1fr 1fr 1fr;">
+            <input type="text" id="st-name" placeholder="Nombre" style="grid-column: span 3">
+            <select id="st-type">
+                <option value="oil">Aceite (ml)</option>
+                <option value="pill">Pill (Pastilla)</option>
+                <option value="hgh">HGH (UI)</option>
+                <option value="pep">Pep (mcg)</option>
+            </select>
+            <input type="number" id="st-qty" placeholder="Stock Total">
+            <input type="number" id="st-conc" placeholder="Conc (mg/ml)">
+            <button class="btn btn-red" onclick="addStock()" style="grid-column: span 3; margin-top:5px">GUARDAR EN INVENTARIO</button>
+        </div>
+        <div id="inventory-list" style="margin-top:15px"></div>
+    </div>
+</div>
 
 <script>
     const CLIENT_ID = '612276120104-tc46nv8856efe38fl7323n9cudkn8pp8.apps.googleusercontent.com';
-    const SCOPES = 'https://www.googleapis.com/auth/drive.file';
-    let protocol = [];
     let driveId = null;
-    const colors = ['#00f3ff', '#39ff14', '#f3ff00', '#ff00ff', '#ff8800'];
-
-    const catalog = {
-        oil: ['Testo Cipio', 'Testo Enant', 'DHB', 'Primo', 'Masteron'],
-        pep: ['BPC-157', 'TB-500', 'GHK-Cu'],
-        hgh: ['Genotropin', 'Humatrope', 'Zptropin'],
-        oral: ['Oxandrolona', 'Winstrol', 'Anadrol']
+    let state = {
+        config: { time: '09:00' },
+        inventory: [], // { name, type, stock, conc, id }
+        protocol: []   // { stockId, freq, dose, checks, color }
     };
 
-    // --- Core Logic ---
     function initGAPI() {
         gapi.load('client:auth2', () => {
-            gapi.client.init({ clientId: CLIENT_ID, discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"], scope: SCOPES })
+            gapi.client.init({ clientId: CLIENT_ID, discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"], scope: 'https://www.googleapis.com/auth/drive.file' })
             .then(() => {
                 const auth = gapi.auth2.getAuthInstance();
-                auth.isSignedIn.listen(s => updateAuthStatus(s));
-                updateAuthStatus(auth.isSignedIn.get());
+                auth.isSignedIn.listen(updateAuth);
+                updateAuth(auth.isSignedIn.get());
             });
         });
     }
 
-    function updateAuthStatus(s) {
-        const dot = document.getElementById('dot');
-        const info = document.getElementById('user-info');
+    function updateAuth(s) {
         if(s) {
-            dot.className = 'status-dot online';
-            info.innerText = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getEmail();
+            document.getElementById('dot').style.background = 'var(--green)';
+            document.getElementById('user').innerText = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getEmail();
             loadData();
         }
     }
 
-    function handleAuth() {
-        const auth = gapi.auth2.getAuthInstance();
-        s = auth.isSignedIn.get();
-        s ? saveData() : auth.signIn();
+    function handleAuth() { gapi.auth2.getAuthInstance().signIn(); }
+
+    // --- Tab Management ---
+    function showTab(tab) {
+        document.querySelectorAll('.tab-view').forEach(v => v.classList.add('hidden'));
+        document.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('active'));
+        document.getElementById('view-' + tab).classList.remove('hidden');
+        document.getElementById('tab-' + tab).classList.add('active');
+        if(tab === 'dash') renderDashboard();
+        if(tab === 'prof') renderInventory();
     }
 
-    function syncSubstances() {
-        const cat = document.getElementById('cat').value;
-        document.getElementById('subst').innerHTML = catalog[cat].map(s => `<option>${s}</option>`).join('');
-        document.getElementById('freq-box').classList.toggle('hidden', cat !== 'oil');
-        document.getElementById('conc-box').classList.toggle('hidden', cat === 'pep' || cat === 'hgh');
-        document.getElementById('dilution-box').classList.toggle('hidden', cat !== 'pep');
-        document.getElementById('dose-label').innerText = cat === 'oil' ? 'Dosis Semanal (mg)' : (cat === 'pep' ? 'Dosis Día (mcg)' : (cat === 'hgh' ? 'Dosis Día (UI)' : 'Dosis Día (mg)'));
+    // --- Inventory Logic ---
+    function addStock() {
+        const item = {
+            id: Date.now(),
+            name: document.getElementById('st-name').value,
+            type: document.getElementById('st-type').value,
+            stock: parseFloat(document.getElementById('st-qty').value),
+            conc: parseFloat(document.getElementById('st-conc').value) || 0
+        };
+        if(!item.name) return;
+        state.inventory.push(item);
+        renderInventory();
+        syncSelects();
+        saveData();
     }
 
-    function addEntry() {
-        const cat = document.getElementById('cat').value;
-        const name = document.getElementById('subst').value;
-        const val = parseFloat(document.getElementById('val').value) || 0;
-        let dose = val; let ml = 0;
+    function renderInventory() {
+        const list = document.getElementById('inventory-list');
+        list.innerHTML = state.inventory.map(i => `
+            <div class="stock-item">
+                <span><b>${i.name}</b> <span class="pill" style="background:#333">${i.type}</span></span>
+                <span>Stock: ${i.stock} | <span style="color:var(--red)" onclick="removeStock(${i.id})">DEL</span></span>
+            </div>
+        `).join('');
+    }
 
-        if(cat === 'oil') {
-            dose = val / parseFloat(document.getElementById('freq').value);
-            ml = dose / parseFloat(document.getElementById('conc').value);
-        } else if(cat === 'pep') {
-            ml = (val / 1000) * (parseFloat(document.getElementById('v_ml').value) / parseFloat(document.getElementById('v_mg').value));
-        } else if(cat === 'hgh') {
-            ml = val * 0.1; // 1 UI = 0.1ml estándar
-        }
+    function removeStock(id) {
+        state.inventory = state.inventory.filter(i => i.id !== id);
+        state.protocol = state.protocol.filter(p => p.stockId !== id);
+        renderInventory();
+        syncSelects();
+        saveData();
+    }
 
-        protocol.push({
-            id: Date.now(), cat, name, dose, ml,
-            unit: (cat === 'pep' ? 'mcg' : (cat === 'hgh' ? 'UI' : 'mg')),
+    function syncSelects() {
+        const sel = document.getElementById('sel-stock');
+        sel.innerHTML = state.inventory.map(i => `<option value="${i.id}">${i.name}</option>`).join('');
+    }
+
+    // --- Dashboard Logic ---
+    function addToProtocol() {
+        const stockId = parseInt(document.getElementById('sel-stock').value);
+        if(!stockId) return;
+        const dose = parseFloat(document.getElementById('inp-dose').value);
+        state.protocol.push({
+            id: Date.now(),
+            stockId: stockId,
+            freq: parseFloat(document.getElementById('sel-freq').value),
+            dose: dose,
             checks: new Array(31).fill(false),
-            color: colors[protocol.length % colors.length]
+            color: `hsl(${Math.random()*360}, 70%, 50%)`
         });
-        saveData(); render();
+        saveData(); renderDashboard();
     }
 
-    function render() {
-        const container = document.getElementById('dashboard');
+    function renderDashboard() {
+        const container = document.getElementById('main-scroll');
         container.innerHTML = '';
-        
-        const oils = protocol.filter(p => p.cat === 'oil');
-        const others = protocol.filter(p => p.cat !== 'oil');
+        state.protocol.forEach(p => {
+            const inv = state.inventory.find(i => i.id === p.stockId);
+            if(!inv) return;
+            
+            let ml = 0;
+            if(inv.type === 'oil') ml = (p.dose / p.freq) / inv.conc;
+            if(inv.type === 'hgh') ml = p.dose * 0.1;
+            if(inv.type === 'pep') ml = p.dose / 1000; // Simplificado mcg->ml
 
-        if(oils.length > 0) createCard(container, "STACK ACEITES", oils, true);
-        others.forEach(o => createCard(container, o.name, [o], false));
-    }
-
-    function createCard(parent, title, items, isSyringe) {
-        const ref = items[0];
-        const totalMl = items.reduce((a, b) => a + b.ml, 0);
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.style.borderLeftColor = ref.color;
-
-        let visualHTML = '';
-        if(ref.cat === 'oral') {
-            visualHTML = `<div class="pill-v" style="border-color:${ref.color}"><div style="width:15px; height:6px; background:${ref.color}; border-radius:3px;"></div></div>`;
-        } else {
-            // Jeringa con escala dinámica (v10.0)
-            const capacity = totalMl <= 0.3 ? 0.3 : (totalMl <= 0.5 ? 0.5 : 1.0);
-            visualHTML = `<div class="syringe-v" style="height: ${80 + (capacity*40)}px">`;
-            items.forEach((item, idx) => {
-                const height = (item.ml / capacity) * 100;
-                const bottom = items.slice(0, idx).reduce((s, curr) => s + (curr.ml / capacity) * 100, 0);
-                visualHTML += `<div class="fluid-segment" style="height:${height}%; bottom:${bottom}%; background:${item.color}; opacity:0.8;"></div>`;
-            });
-            visualHTML += `<div style="position:absolute; right:-25px; top:0; font-size:7px; color:#555;">${capacity}ml</div></div>`;
-        }
-
-        card.innerHTML = `
-            <div class="card-header">
-                <span class="substance-name">${title}</span>
-                <span style="font-size:14px; color:var(--green); font-weight:800;">${totalMl > 0 ? totalMl.toFixed(2)+'ml' : ref.dose+ref.unit}</span>
-                <button onclick="remove(${ref.id})" style="background:none; border:none; color:#444;">×</button>
-            </div>
-            <div class="syringe-container">
-                ${visualHTML}
-                <div style="font-size:10px; line-height:1.4;">
-                    ${items.map(i => `<div>• ${i.name}: <span style="color:white">${i.dose.toFixed(1)}${i.unit}</span></div>`).join('')}
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style.borderLeftColor = p.color;
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center">
+                    <span style="font-weight:bold; color:var(--blue)">${inv.name}</span>
+                    <span style="color:var(--green)">${inv.type === 'pill' ? p.dose + ' pastilla' : ml.toFixed(2) + ' ml'}</span>
+                    <button onclick="removeProtocol(${p.id})" style="background:none; border:none; color:#444">×</button>
                 </div>
-            </div>
-            <div class="calendar">
-                ${ref.checks.map((c, idx) => `<div class="day ${c?'active':''}" onclick="toggle(${ref.id}, ${idx})">${idx+1}</div>`).join('')}
-            </div>
-        `;
-        parent.appendChild(card);
+                <div style="font-size:10px; color:#666; margin-top:4px">Dosis: ${p.dose}${inv.type==='pill'?'mg':inv.type==='hgh'?'UI':'mg'} | Restante: ${inv.stock.toFixed(1)}</div>
+                <div class="calendar">
+                    ${p.checks.map((c, idx) => `<div class="day ${c?'active':''}" onclick="toggleCheck(${p.id}, ${idx})">${idx+1}</div>`).join('')}
+                </div>
+            `;
+            container.appendChild(card);
+        });
     }
 
-    function toggle(id, day) {
-        const p = protocol.find(x => x.id === id);
-        if(p.cat === 'oil') protocol.filter(x => x.cat === 'oil').forEach(x => x.checks[day] = !x.checks[day]);
-        else p.checks[day] = !p.checks[day];
+    function toggleCheck(id, day) {
+        const p = state.protocol.find(x => x.id === id);
+        const inv = state.inventory.find(i => i.id === p.stockId);
+        
+        // Lógica de Stock: Si marca, resta. Si desmarca, suma.
+        if(!p.checks[day]) inv.stock -= (inv.type === 'oil' ? p.dose/p.freq : p.dose);
+        else inv.stock += (inv.type === 'oil' ? p.dose/p.freq : p.dose);
+
+        p.checks[day] = !p.checks[day];
         if(navigator.vibrate) navigator.vibrate(30);
-        saveData(); render();
+        saveData(); renderDashboard();
     }
 
-    function remove(id) { protocol = protocol.filter(x => x.id !== id); saveData(); render(); }
+    function removeProtocol(id) { state.protocol = state.protocol.filter(x => x.id !== id); saveData(); renderDashboard(); }
 
-    // --- Drive Sync Engine ---
+    // --- Data Persistence ---
     async function saveData() {
         if(!gapi.auth2.getAuthInstance().isSignedIn.get()) return;
-        const metadata = { 'name': 'bio_v10.json', 'mimeType': 'application/json' };
-        const boundary = 'v10_sync';
-        const body = `--${boundary}\nContent-Type: application/json\n\n${JSON.stringify(metadata)}\n--${boundary}\nContent-Type: application/json\n\n${JSON.stringify(protocol)}\n--${boundary}--`;
-        
+        const metadata = { 'name': 'bio_v11.json', 'mimeType': 'application/json' };
+        const boundary = 'v11_sync';
+        const body = `--${boundary}\nContent-Type: application/json\n\n${JSON.stringify(metadata)}\n--${boundary}\nContent-Type: application/json\n\n${JSON.stringify(state)}\n--${boundary}--`;
         gapi.client.request({
             path: driveId ? `/upload/drive/v3/files/${driveId}` : '/upload/drive/v3/files',
             method: driveId ? 'PATCH' : 'POST',
             params: { uploadType: 'multipart' },
             headers: { 'Content-Type': `multipart/related; boundary=${boundary}` },
             body: body
-        }).execute(res => { driveId = res.id; console.log("Cloud Saved"); });
+        }).execute(res => { driveId = res.id; });
     }
 
     async function loadData() {
-        const res = await gapi.client.drive.files.list({ q: "name = 'bio_v10.json' and trashed = false" });
+        const res = await gapi.client.drive.files.list({ q: "name = 'bio_v11.json' and trashed = false" });
         if(res.result.files.length > 0) {
             driveId = res.result.files[0].id;
             const file = await gapi.client.drive.files.get({ fileId: driveId, alt: 'media' });
-            protocol = file.result || [];
-            render();
+            state = file.result || state;
+            syncSelects();
+            renderDashboard();
+            renderInventory();
+            document.getElementById('prof-time').value = state.config.time;
         }
     }
-
-    syncSubstances();
 </script>
 </body>
 </html>
